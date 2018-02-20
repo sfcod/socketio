@@ -1,5 +1,5 @@
 {
-    "name": "sfcod/socket-io",
+    "name": "sfcod/socketio",
     "type": "symfony-bundle",
     "description": "SocketIo adapter for Symfony",
     "license": "MIT",
