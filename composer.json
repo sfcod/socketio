@@ -1,0 +1,34 @@
+{
+    "name": "sfcod/socket-io",
+    "type": "symfony-bundle",
+    "description": "SocketIo adapter for Symfony",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Orlov Aleksey",
+            "email": "aaorlov88@gmail.com"
+        },
+        {
+          "name": "Virchenko Maksim",
+          "email": "muslim1992@gmail.com",
+          "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "symfony/framework-bundle": "^4.0",
+        "predis/predis": "^1.1",
+        "symfony/monolog-bundle": "^3.1",
+        "symfony/dotenv": "^4.0",
+        "symfony/process": "^4.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^4.0",
+        "friendsofphp/php-cs-fixer": "^2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "SfCod\\SocketIoBundle\\": ""
+        }
+    }
+}
