@@ -10,15 +10,15 @@ Use all power of socket.io in your Symfony project.
     cd ~
     curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
     sudo bash nodesource_setup.sh
-    cd vendor/yiicod/yii2-soketio/server
+    cd vendor/sfcod/soketio/server
     npm install
 ```
 
 ```yaml
 sfcod_socketio:
     namespaces:
-        - 'App\Bundle\SocketIo\Publisher'
-        - 'App\Bundle\SocketIo\Subscriber'
+        - 'App\SocketIo\Publisher'
+        - 'App\SocketIo\Subscriber'
 ```
 ```dotenv
 ###> socketio config ###
