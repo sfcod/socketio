@@ -1,6 +1,8 @@
 Symfony Socket.io bundle
 ========================
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sfcod/socketio/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sfcod/socketio/?branch=master)[![Code Climate](https://codeclimate.com/github/sfcod/socketio/badges/gpa.svg)](https://codeclimate.com/github/sfcod/socketio)
+
 Use all power of socket.io in your Symfony project.
 
 #### Config
