@@ -9,7 +9,7 @@
   "dependencies": {
     "argparse": "^1.0.9",
     "redis": "^2.6.3",
-    "socket.io": "~1",
-    "winston": "*"
+    "socket.io": "^2.0.4",
+    "winston": "^2.0.0"
   }
 }
