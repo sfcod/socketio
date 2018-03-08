@@ -25,7 +25,7 @@ trait WorkerTrait
      *
      * @return Process
      */
-    public function nodeJs(string $server, array $ssl = []): Process
+    public function nodeJs(string $server, string $ssl = ''): Process
     {
         $cmd = sprintf('node %s/%s', realpath(dirname(__FILE__) . '/../Server'), 'index.js');
 
@@ -43,7 +43,7 @@ trait WorkerTrait
             'sub' => $connection,
             'channels' => implode(',', $this->getContainer()->get(Broadcast::class)->channels()),
             'nsp' => getenv('SOCKET_IO_NSP'),
-            'ssl' => empty($ssl) ? null : json_encode($ssl),
+            'ssl' => empty($ssl) ? null : $ssl,
             'runtime' => $this->getContainer()->get('kernel')->getRootDir() . '/../../var/log/socketio',
         ], 'strlen');
         foreach ($args as $key => $value) {

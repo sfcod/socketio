@@ -59,7 +59,7 @@ class NodeJsServerCommand extends ContainerAwareCommand
     {
         $process = $this->nodeJs(
             $input->getOption('server') ?? getenv('SOCKET_IO_WS_SERVER'),
-            $input->getOption('ssl') ?? getenv('SOCKET_IO_SSL') ? (array)getenv('SOCKET_IO_SSL') : []
+            $input->getOption('ssl') ?? getenv('SOCKET_IO_SSL') ? getenv('SOCKET_IO_SSL') : ''
         );
         $process->setIdleTimeout(false);
         $process->setTimeout(null);

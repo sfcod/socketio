@@ -26,7 +26,7 @@ sfcod_socketio:
 ###> socketio config ###
 SOCKET_IO_WS_SERVER=localhost:1358
 SOCKET_IO_WS_CLIENT=localhost:1358
-SOCKET_IO_SSL=''
+SOCKET_IO_SSL='' || '{"key":"path to key", "cert":"path to cert"}'
 SOCKET_IO_NSP=redis
 ###< socketio config ###
 ```
