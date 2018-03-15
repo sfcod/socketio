@@ -117,7 +117,7 @@ SOCKET_IO_NSP=redis
         {
             // Mark notification as read
             // And call client update
-            Broadcast::emit('update_notification_count', ['some key' => 'some value']);
+            $this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value']);
         }
     }
 ```
@@ -169,7 +169,7 @@ You can have publisher and receiver in one event. If you need check data from cl
         {
             // Mark notification as read
             // And call client update
-            Broadcast::emit('update_notification_count', ['some key' => 'some value']);
+            $this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value']);
         }
     }
 ```
@@ -182,7 +182,7 @@ Socket.io has room functional. If you need it, you should implement:
     use SfCod\SocketIoBundle\Events\EventRoomInterface;
     
     class CountEvent extends AbstractEvent implements EventInterface, EventPubscriberInterface, EventRoomInterface
-    {
+    {           
         /**
          * Changel name. For client side this is nsp.
          */
@@ -205,7 +205,7 @@ Socket.io has room functional. If you need it, you should implement:
          */
         public function room(): string
         {
-            return md5('notifications' . 'room-1');
+            return 'user_id_' . $this->>userId;
         }            
             
         /**
@@ -213,7 +213,7 @@ Socket.io has room functional. If you need it, you should implement:
          * @return array
          */
         public function fire(): array
-        {
+        {                        
             return [
                 'count' => 10,
             ];
@@ -223,11 +223,15 @@ Socket.io has room functional. If you need it, you should implement:
 
 ```js
     var socket = io('{your_host_address}:1367/notifications');
-    socket.emit('join', {room: 'room-1'});
+    socket.emit('join', {room: 'user_id_10'});
     // Now you will receive data from 'room-1'
     socket.on('update_notification_count', function(data){
         console.log(data)
     });
     // You can leave room
     socket.emit('leave');
+```
+Only user with id 10 will receive data
+```php
+$this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value', 'userId' => 10]);
 ```

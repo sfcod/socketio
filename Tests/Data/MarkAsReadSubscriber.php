@@ -32,6 +32,6 @@ class MarkAsReadSubscriber extends AbstractEvent implements EventInterface, Even
     {
         // Mark notification as read
         // And call client update
-        Broadcast::emit('update_notification_count', ['some key' => 'some value']);
+        $this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value']);
     }
 }
