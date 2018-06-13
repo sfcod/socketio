@@ -2,8 +2,6 @@
 
 namespace SfCod\SocketIoBundle\Events;
 
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 /**
  * Class AbstractEvent
  *
@@ -13,8 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  */
 abstract class AbstractEvent implements EventInterface
 {
-    use ContainerAwareTrait;
-
     /**
      * Please, define '@property' and use it using magic __get() method instead of using $this->payload
      *

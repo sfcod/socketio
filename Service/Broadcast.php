@@ -11,7 +11,6 @@ use SfCod\SocketIoBundle\events\EventPolicyInterface;
 use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\events\EventRoomInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,8 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Broadcast
 {
-    use ContainerAwareTrait;
-
     /**
      * @var RedisDriver
      */
@@ -44,6 +41,11 @@ class Broadcast
     protected $process;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var array
      */
     protected static $channels = [];
@@ -62,9 +64,7 @@ class Broadcast
         $this->logger = $logger;
         $this->manager = $manager;
         $this->process = $process;
-
-        //@todo remove
-        $this->setContainer($container);
+        $this->container = $container;
     }
 
     /**
@@ -104,9 +104,6 @@ class Broadcast
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
-
-            // @todo remove setContainer
-            $eventHandler->setContainer($this->container);
 
             if (false === $eventHandler instanceof EventSubscriberInterface) {
                 throw new Exception('Event should implement EventSubscriberInterface');
@@ -149,8 +146,6 @@ class Broadcast
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
-
-            $eventHandler->setContainer($this->container);
 
             if (false === $eventHandler instanceof EventPublisherInterface) {
                 throw new Exception('Event should implement EventPublisherInterface');
