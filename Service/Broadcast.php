@@ -115,10 +115,12 @@ class Broadcast
                 return;
             }
 
-            /** @var Connection $connection */
-            $connection = $this->container->get('doctrine')->getConnection();
-            $connection->close();
-            $connection->connect();
+            if ($this->container->has('doctrine')) {
+                /** @var Connection $connection */
+                $connection = $this->container->get('doctrine')->getConnection();
+                $connection->close();
+                $connection->connect();
+            }
 
             $eventHandler->handle();
         } catch (Exception $e) {

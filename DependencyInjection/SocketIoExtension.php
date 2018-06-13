@@ -94,7 +94,9 @@ class SocketIoExtension extends Extension
             new Reference(EventManager::class),
             new Reference(RedisDriver::class),
             new Reference(Broadcast::class),
-            $container->get('kernel')->getLogDir() . '/socketio',
+            $container->hasParameter('kernel.logs_dir') ?
+                $container->getParameter('kernel.logs_dir') . '/socketio' :
+                $container->getParameter('kernel.root_dir') . '/../../var/log/socketio',
         ]);
 
         $container->setDefinition(Worker::class, $worker);
