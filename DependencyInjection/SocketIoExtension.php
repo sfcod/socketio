@@ -109,12 +109,21 @@ class SocketIoExtension extends Extension
     private function createCommands(array $config, ContainerBuilder $container)
     {
         $nodeJs = new Definition(NodeJsServerCommand::class);
+        $nodeJs->setArguments([
+            new Reference(Worker::class),
+        ]);
         $nodeJs->addTag('console.command');
 
         $phpServer = new Definition(PhpServerCommand::class);
+        $phpServer->setArguments([
+            new Reference(Worker::class),
+        ]);
         $phpServer->addTag('console.command');
 
         $process = new Definition(ProcessCommand::class);
+        $process->setArguments([
+            new Reference(Broadcast::class),
+        ]);
         $process->addTag('console.command');
 
         $container->addDefinitions([
