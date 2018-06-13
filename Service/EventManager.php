@@ -49,6 +49,7 @@ class EventManager
      */
     public function getList(): array
     {
+        //@todo remove this, move to extension using tags
         if (empty(self::$list)) {
             foreach ($this->namespaces as $key => $namespace) {
                 $alias = $this->container->getParameter('kernel.root_dir') . '/../' . str_replace('\\', DIRECTORY_SEPARATOR, trim($namespace, '\\'));

@@ -2,9 +2,8 @@
 
 namespace SfCod\SocketIoBundle\Command;
 
-use SfCod\SocketIoBundle\Base\WorkerTrait;
-use SfCod\SocketIoBundle\Service\EventManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use SfCod\SocketIoBundle\Service\Worker;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,20 +14,20 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package yiicod\socketio\commands
  */
-class NodeJsServerCommand extends ContainerAwareCommand
+class NodeJsServerCommand extends Command
 {
-    use WorkerTrait;
-
     /**
-     * @var EventManager
+     * @var Worker
      */
-    protected $eventManager;
+    protected $worker;
 
     /**
      * NodeJsServerCommand constructor.
      */
-    public function __construct()
+    public function __construct(Worker $worker)
     {
+        $this->worker = $worker;
+
         parent::__construct();
     }
 
@@ -57,7 +56,7 @@ class NodeJsServerCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $process = $this->nodeJs(
+        $process = $this->worker->nodeJs(
             $input->getOption('server') ?? getenv('SOCKET_IO_WS_SERVER'),
             $input->getOption('ssl') ?? getenv('SOCKET_IO_SSL') ? getenv('SOCKET_IO_SSL') : ''
         );

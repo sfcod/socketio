@@ -63,6 +63,7 @@ class Broadcast
         $this->manager = $manager;
         $this->process = $process;
 
+        //@todo remove
         $this->setContainer($container);
     }
 
@@ -85,8 +86,6 @@ class Broadcast
 
         $this->logger->info(json_encode(['type' => 'on', 'name' => $event, 'data' => $data]));
 
-//        $eventHandlerClass = $this->getEventHandlerClass($event);
-
         return $this->process->run($event, $data);
     }
 
@@ -106,6 +105,7 @@ class Broadcast
                 throw new Exception('Event should implement EventInterface');
             }
 
+            // @todo remove setContainer
             $eventHandler->setContainer($this->container);
 
             if (false === $eventHandler instanceof EventSubscriberInterface) {
@@ -140,10 +140,7 @@ class Broadcast
         $this->logger->info(json_encode(['type' => 'emit', 'name' => $event, 'data' => $data]));
 
         try {
-//            $eventHandlerClass = $this->getEventHandlerClass($event);
-
             /** @var EventInterface|EventPublisherInterface|EventRoomInterface $eventHandler */
-//            $eventHandler = new $eventHandlerClass($data);
             $eventHandler = $this->container->get(sprintf('socketio.%s', $event));
             $eventHandler->setPayload($data);
 
@@ -218,24 +215,4 @@ class Broadcast
     {
         $this->redis->getClient(true)->publish($channel, json_encode($data));
     }
-
-//    /**
-//     * Get event handler service
-//     *
-//     * @param string $event
-//     *
-//     * @return string
-//     *
-//     * @throws Exception
-//     */
-//    protected function getEventHandlerClass(string $event): string
-//    {
-//        $eventHandlerClass = $this->manager->getList()[$event] ?? null;
-//
-//        if (null === $eventHandlerClass) {
-//            throw new Exception("Can not find $event");
-//        }
-//
-//        return $eventHandlerClass;
-//    }
 }

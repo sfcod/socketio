@@ -7,6 +7,7 @@ use SfCod\SocketIoBundle\Service\EventManager;
 use SfCod\SocketIoBundle\Service\RedisDriver;
 use Symfony\Component\Process\Process;
 
+//@todo remove this trait, create service instead
 trait WorkerTrait
 {
     /**

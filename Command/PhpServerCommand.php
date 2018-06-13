@@ -2,8 +2,8 @@
 
 namespace SfCod\SocketIoBundle\Command;
 
-use SfCod\SocketIoBundle\Base\WorkerTrait;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use SfCod\SocketIoBundle\Service\Worker;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -14,19 +14,24 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @package yiicod\socketio\commands
  */
-class PhpServerCommand extends ContainerAwareCommand
+class PhpServerCommand extends Command
 {
-    use WorkerTrait;
+    /**
+     * @var Worker
+     */
+    protected $worker;
 
     /**
-     * @var OutputInterface
+     * PhpServerCommand constructor.
+     *
+     * @param Worker $worker
      */
-    protected $output;
+    public function __construct(Worker $worker)
+    {
+        $this->worker = $worker;
 
-    /**
-     * @var InputInterface
-     */
-    protected $input;
+        parent::__construct();
+    }
 
     /**
      * Configure command
@@ -51,17 +56,12 @@ class PhpServerCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
-        $this->output = $output;
+        $io = new SymfonyStyle($input, $output);
+
+        $io->success(sprintf('Worker daemon has been started.'));
 
         while (true) {
-            $this->predis();
+            $this->worker->predis();
         }
-    }
-
-    public function output($text)
-    {
-        $io = new SymfonyStyle($this->input, $this->output);
-        $io->success($text);
     }
 }

@@ -13,6 +13,7 @@ use SfCod\SocketIoBundle\Service\Broadcast;
 use SfCod\SocketIoBundle\Service\EventManager;
 use SfCod\SocketIoBundle\Service\Process;
 use SfCod\SocketIoBundle\Service\RedisDriver;
+use SfCod\SocketIoBundle\Service\Worker;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -53,6 +54,7 @@ class SocketIoExtension extends Extension
         $this->createBroadcast($config, $container);
         $this->createEventManager($config, $container);
         $this->createProcess($config, $container);
+        $this->createWorker($config, $container);
         $this->createCommands($config, $container);
 
         $eventManager = $container->get(EventManager::class);
@@ -75,6 +77,27 @@ class SocketIoExtension extends Extension
     public function getAlias()
     {
         return 'sfcod_socketio';
+    }
+
+    /**
+     * Create worker
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     *
+     * @throws \Exception
+     */
+    private function createWorker(array $config, ContainerBuilder $container)
+    {
+        $worker = new Definition(Worker::class);
+        $worker->setArguments([
+            new Reference(EventManager::class),
+            new Reference(RedisDriver::class),
+            new Reference(Broadcast::class),
+            $container->get('kernel')->getLogDir() . '/socketio',
+        ]);
+
+        $container->setDefinition(Worker::class, $worker);
     }
 
     /**
@@ -110,7 +133,6 @@ class SocketIoExtension extends Extension
     private function createDriver(array $config, ContainerBuilder $container)
     {
         $redis = new Definition(RedisDriver::class);
-        $redis->setPublic(true);
         $redis->setArguments([
             getenv('REDIS_URL'),
         ]);
@@ -127,7 +149,6 @@ class SocketIoExtension extends Extension
     private function createBroadcast(array $config, ContainerBuilder $container)
     {
         $broadcast = new Definition(Broadcast::class);
-        $broadcast->setPublic(true);
         $broadcast->setArguments([
             new Reference(ContainerInterface::class),
             new Reference(RedisDriver::class),
@@ -148,7 +169,6 @@ class SocketIoExtension extends Extension
     private function createEventManager(array $config, ContainerBuilder $container)
     {
         $eventManager = new Definition(EventManager::class);
-        $eventManager->setPublic(true);
         $eventManager->setArguments([
             new Reference(ContainerInterface::class),
             $config['namespaces'],
@@ -166,7 +186,6 @@ class SocketIoExtension extends Extension
     private function createProcess(array $config, ContainerBuilder $container)
     {
         $jobProcess = new Definition(Process::class);
-        $jobProcess->setPublic(true);
         $jobProcess->setArguments([
             'console',
             sprintf('%s/bin', $container->getParameter('kernel.project_dir')),
