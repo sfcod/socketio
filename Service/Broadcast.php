@@ -100,10 +100,12 @@ class Broadcast
         try {
             /** @var EventInterface|EventSubscriberInterface|EventPolicyInterface $eventHandler */
             $eventHandler = $this->container->get(sprintf('socketio.%s', $handler));
-            $eventHandler->setPayload($data);
+
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
+
+            $eventHandler->setPayload($data);
 
             if (false === $eventHandler instanceof EventSubscriberInterface) {
                 throw new Exception('Event should implement EventSubscriberInterface');
@@ -139,13 +141,14 @@ class Broadcast
         try {
             /** @var EventInterface|EventPublisherInterface|EventRoomInterface $eventHandler */
             $eventHandler = $this->container->get(sprintf('socketio.%s', $event));
-            $eventHandler->setPayload($data);
-
-            $eventHandlerClass = get_class($eventHandler);
 
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
+
+            $eventHandler->setPayload($data);
+
+            $eventHandlerClass = get_class($eventHandler);
 
             if (false === $eventHandler instanceof EventPublisherInterface) {
                 throw new Exception('Event should implement EventPublisherInterface');
