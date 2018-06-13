@@ -4,6 +4,7 @@ namespace SfCod\SocketIoBundle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
 use SfCod\SocketIoBundle\Service\Broadcast;
 use SfCod\SocketIoBundle\Tests\Data\LoadTrait;
@@ -12,9 +13,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * Class BroadcastTest
- *
  * @author Virchenko Maksim <muslim1992@gmail.com>
- *
  * @package SfCod\SocketIoBundle\Tests
  */
 class BroadcastTest extends TestCase
@@ -68,10 +67,29 @@ class BroadcastTest extends TestCase
         $this->broadcast->process(get_class($handler), $data);
     }
 
+    /**
+     * @todo implement
+     */
     public function testEmit()
     {
+//        $data = range(1, 10);
+//
+//        $handler = $this->getMockBuilder([EventInterface::class, EventPublisherInterface::class])->getMock();
+//        $handler
+//            ->expects($this->once())
+//            ->method('setPayload')
+//            ->with($data);
+//        $handler
+//            ->expects($this->once())
+//            ->method('fire');
+//
+//        $this->container->set(sprintf('socketio.%s', get_class($handler)), $handler);
+//        $this->broadcast->emit(get_class($handler), $data);
     }
 
+    /**
+     * @todo implement
+     */
     public function testChannels()
     {
     }

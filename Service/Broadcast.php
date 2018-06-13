@@ -158,7 +158,7 @@ class Broadcast
 
             $data = $eventHandler->fire();
 
-            if (true === $eventHandler instanceof EventRoomInterface) {
+            if ($eventHandler instanceof EventRoomInterface) {
                 $data['room'] = $eventHandler->room();
             }
 
