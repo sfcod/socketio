@@ -150,8 +150,6 @@ class Broadcast
 
             $eventHandler->setPayload($data);
 
-            $eventHandlerClass = get_class($eventHandler);
-
             if (false === $eventHandler instanceof EventPublisherInterface) {
                 throw new Exception('Event should implement EventPublisherInterface');
             }
@@ -162,6 +160,7 @@ class Broadcast
                 $data['room'] = $eventHandler->room();
             }
 
+            $eventHandlerClass = get_class($eventHandler);
             foreach ($eventHandlerClass::broadcastOn() as $channel) {
                 $this->publish($this->channelName($channel), [
                     'name' => $eventHandlerClass::name(),

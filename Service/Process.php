@@ -29,14 +29,6 @@ class Process
     private $binPath;
 
     /**
-     * @return int
-     */
-    public function getParallelEnv(): int
-    {
-        return getenv('SOCKET_IO.PARALLEL') ? getenv('SOCKET_IO.PARALLEL') : 10;
-    }
-
-    /**
      * Process constructor.
      *
      * @param string $scriptName
@@ -46,6 +38,16 @@ class Process
     {
         $this->scriptName = $scriptName;
         $this->binPath = $binPath;
+    }
+
+    /**
+     * Get parallel processes count
+     *
+     * @return int
+     */
+    public function getParallelEnv(): int
+    {
+        return getenv('SOCKET_IO.PARALLEL') ? getenv('SOCKET_IO.PARALLEL') : 10;
     }
 
     /**

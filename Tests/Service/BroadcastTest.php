@@ -13,7 +13,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * Class BroadcastTest
+ *
  * @author Virchenko Maksim <muslim1992@gmail.com>
+ *
  * @package SfCod\SocketIoBundle\Tests
  */
 class BroadcastTest extends TestCase
@@ -67,11 +69,10 @@ class BroadcastTest extends TestCase
         $this->broadcast->process(get_class($handler), $data);
     }
 
-    /**
-     * @todo implement
-     */
-    public function testEmit()
-    {
+//    /**
+//     */
+//    public function testEmit()
+//    {
 //        $data = range(1, 10);
 //
 //        $handler = $this->getMockBuilder([EventInterface::class, EventPublisherInterface::class])->getMock();
@@ -85,12 +86,12 @@ class BroadcastTest extends TestCase
 //
 //        $this->container->set(sprintf('socketio.%s', get_class($handler)), $handler);
 //        $this->broadcast->emit(get_class($handler), $data);
-    }
+//    }
 
-    /**
-     * @todo implement
-     */
-    public function testChannels()
-    {
-    }
+//    /**
+//     */
+//    public function testChannels()
+//    {
+//
+//    }
 }

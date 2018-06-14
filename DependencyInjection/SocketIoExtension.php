@@ -181,7 +181,7 @@ class SocketIoExtension extends Extension
     {
         $eventManager = new Definition(EventManager::class);
         $eventManager->setArguments([
-            new Reference(ContainerInterface::class),
+            $container->getParameter('kernel.root_dir'),
             $config['namespaces'],
         ]);
 
