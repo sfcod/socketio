@@ -1,27 +1,61 @@
 <?php
 
-namespace SfCod\SocketIoBundle\Base;
+namespace SfCod\SocketIoBundle\Service;
 
-use SfCod\SocketIoBundle\Service\Broadcast;
-use SfCod\SocketIoBundle\Service\EventManager;
-use SfCod\SocketIoBundle\Service\RedisDriver;
+use Predis\Connection\ConnectionException;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-trait WorkerTrait
+/**
+ * Class Worker
+ *
+ * @author Virchenko Maksim <muslim1992@gmail.com>
+ *
+ * @package SfCod\SocketIoBundle\Service
+ */
+class Worker
 {
     /**
-     * @return mixed
+     * @var EventManager
      */
-    public function getEventManager()
+    private $eventManager;
+
+    /**
+     * @var RedisDriver
+     */
+    private $redisDriver;
+
+    /**
+     * @var Broadcast
+     */
+    private $broadcast;
+
+    /**
+     * @var string
+     */
+    private $logDir;
+
+    /**
+     * Worker constructor.
+     *
+     * @param EventManager $eventManager
+     * @param RedisDriver $redisDriver
+     * @param Broadcast $broadcast
+     * @param string $logDir
+     */
+    public function __construct(EventManager $eventManager, RedisDriver $redisDriver, Broadcast $broadcast, string $logDir)
     {
-        return $this->eventManager ?? $this->getContainer()->get(EventManager::class);
+        $this->eventManager = $eventManager;
+        $this->redisDriver = $redisDriver;
+        $this->broadcast = $broadcast;
+        $this->logDir = $logDir;
     }
 
     /**
      * Get node js process
      *
      * @param string $server
-     * @param array $ssl
+     * @param string $ssl
      *
      * @return Process
      */
@@ -29,22 +63,20 @@ trait WorkerTrait
     {
         $cmd = sprintf('node %s/%s', realpath(dirname(__FILE__) . '/../Server'), 'index.js');
 
-        /** @var RedisDriver $redis */
-        $redis = $this->getContainer()->get(RedisDriver::class);
         $connection = json_encode(array_filter([
-            'host' => $redis->getHost(),
-            'port' => $redis->getPort(),
-            'password' => $redis->getPassword(),
+            'host' => $this->redisDriver->getHost(),
+            'port' => $this->redisDriver->getPort(),
+            'password' => $this->redisDriver->getPassword(),
         ]));
 
         $args = array_filter([
             'server' => $server,
             'pub' => $connection,
             'sub' => $connection,
-            'channels' => implode(',', $this->getContainer()->get(Broadcast::class)->channels()),
+            'channels' => implode(',', $this->broadcast->channels()),
             'nsp' => getenv('SOCKET_IO_NSP'),
             'ssl' => empty($ssl) ? null : $ssl,
-            'runtime' => $this->getContainer()->get('kernel')->getRootDir() . '/../../var/log/socketio',
+            'runtime' => $this->logDir,
         ], 'strlen');
         foreach ($args as $key => $value) {
             $cmd .= ' -' . $key . '=\'' . $value . '\'';
@@ -58,17 +90,17 @@ trait WorkerTrait
     /**
      * Start predis
      */
-    public function predis()
+    public function predis(SymfonyStyle $io)
     {
-        $pubSubLoop = function () {
+        $pubSubLoop = function () use ($io) {
             /** @var \Predis\Client $client */
-            $client = $this->getContainer()->get(RedisDriver::class)->getClient(true);
+            $client = $this->redisDriver->getClient(true);
 
             // Initialize a new pubsub consumer.
             $pubSub = $client->pubSubLoop();
 
             $channels = [];
-            foreach ($this->getContainer()->get(Broadcast::class)->channels() as $key => $channel) {
+            foreach ($this->broadcast->channels() as $key => $channel) {
                 $channels[$key] = $channel . '.io';
             }
 
@@ -82,21 +114,21 @@ trait WorkerTrait
             foreach ($pubSub as $message) {
                 switch ($message->kind) {
                     case 'subscribe':
-                        $this->output("Subscribed to {$message->channel}");
+                        $io->success("Subscribed to {$message->channel}");
                         break;
                     case 'message':
                         if ('control_channel' == $message->channel) {
                             if ('quit_loop' == $message->payload) {
-                                $this->output("Aborting pubsub loop...\n");
+                                $io->success("Aborting pubsub loop...\n");
                                 $pubSub->unsubscribe();
                             } else {
-                                $this->output("Received an unrecognized command: {$message->payload}\n");
+                                $io->success("Received an unrecognized command: {$message->payload}\n");
                             }
                         } else {
                             $payload = json_decode($message->payload, true);
                             $data = $payload['data'] ?? [];
 
-                            $this->getContainer()->get(Broadcast::class)->on($payload['name'], $data);
+                            $this->broadcast->on($payload['name'], $data);
                         }
                         break;
                 }
@@ -111,7 +143,7 @@ trait WorkerTrait
         // Auto recconnect on redis timeout
         try {
             $pubSubLoop();
-        } catch (\Predis\Connection\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             $pubSubLoop();
         }
     }

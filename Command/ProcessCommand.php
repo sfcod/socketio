@@ -4,7 +4,7 @@ namespace SfCod\SocketIoBundle\Command;
 
 use Psr\Log\LoggerInterface;
 use SfCod\SocketIoBundle\Service\Broadcast;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,12 +15,29 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package yiicod\socketio\commands
  */
-class ProcessCommand extends ContainerAwareCommand
+class ProcessCommand extends Command
 {
     /**
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var Broadcast
+     */
+    protected $broadcast;
+
+    /**
+     * ProcessCommand constructor.
+     *
+     * @param Broadcast $broadcast
+     */
+    public function __construct(Broadcast $broadcast)
+    {
+        $this->broadcast = $broadcast;
+
+        parent::__construct();
+    }
 
     /**
      * Configure command
@@ -47,7 +64,6 @@ class ProcessCommand extends ContainerAwareCommand
     {
         $handler = $input->getOption('handler');
 
-        $broadcast = $this->getContainer()->get(Broadcast::class);
-        $broadcast->process($handler, @unserialize($input->getOption('data')) ?? []);
+        $this->broadcast->process($handler, @unserialize($input->getOption('data')) ?? []);
     }
 }

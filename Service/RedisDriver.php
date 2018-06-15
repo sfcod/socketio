@@ -144,13 +144,10 @@ class RedisDriver
         if (false !== $pos = strrpos($dsn, '@')) {
             // parse password
             $password = substr($dsn, 0, $pos);
-
             if (strstr($password, ':')) {
                 list(, $password) = explode(':', $password, 2);
             }
-
             $this->password = urldecode($password);
-
             $dsn = substr($dsn, $pos + 1);
         }
         $dsn = preg_replace_callback('/\?(.*)$/', [$this, 'parseParameters'], $dsn); // parse parameters
@@ -183,7 +180,6 @@ class RedisDriver
     protected function parseParameters($matches)
     {
         parse_str($matches[1], $params);
-
         foreach ($params as $key => $val) {
             if (!$val) {
                 continue;

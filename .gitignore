@@ -2,7 +2,9 @@
 /.env
 /composer.lock
 /composer.phar
+package-lock.json
 /vendor/
 /.php_cs.cache
 /node_modules/
 /.phpunit/
+.idea

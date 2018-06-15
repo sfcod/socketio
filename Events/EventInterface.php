@@ -2,15 +2,13 @@
 
 namespace SfCod\SocketIoBundle\Events;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
 /**
  * Interface EventInterface
  * Event name and broadcast nsp
  *
  * @package SfCod\SocketIoBundle\Events
  */
-interface EventInterface extends ContainerAwareInterface
+interface EventInterface
 {
     /**
      * List broadcast nsp array

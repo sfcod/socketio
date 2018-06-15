@@ -11,7 +11,6 @@ use SfCod\SocketIoBundle\events\EventPolicyInterface;
 use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\events\EventRoomInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,8 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Broadcast
 {
-    use ContainerAwareTrait;
-
     /**
      * @var RedisDriver
      */
@@ -44,6 +41,11 @@ class Broadcast
     protected $process;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var array
      */
     protected static $channels = [];
@@ -62,8 +64,7 @@ class Broadcast
         $this->logger = $logger;
         $this->manager = $manager;
         $this->process = $process;
-
-        $this->setContainer($container);
+        $this->container = $container;
     }
 
     /**
@@ -85,8 +86,6 @@ class Broadcast
 
         $this->logger->info(json_encode(['type' => 'on', 'name' => $event, 'data' => $data]));
 
-//        $eventHandlerClass = $this->getEventHandlerClass($event);
-
         return $this->process->run($event, $data);
     }
 
@@ -101,12 +100,12 @@ class Broadcast
         try {
             /** @var EventInterface|EventSubscriberInterface|EventPolicyInterface $eventHandler */
             $eventHandler = $this->container->get(sprintf('socketio.%s', $handler));
-            $eventHandler->setPayload($data);
+
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
 
-            $eventHandler->setContainer($this->container);
+            $eventHandler->setPayload($data);
 
             if (false === $eventHandler instanceof EventSubscriberInterface) {
                 throw new Exception('Event should implement EventSubscriberInterface');
@@ -116,10 +115,12 @@ class Broadcast
                 return;
             }
 
-            /** @var Connection $connection */
-            $connection = $this->container->get('doctrine')->getConnection();
-            $connection->close();
-            $connection->connect();
+            if ($this->container->has('doctrine')) {
+                /** @var Connection $connection */
+                $connection = $this->container->get('doctrine')->getConnection();
+                $connection->close();
+                $connection->connect();
+            }
 
             $eventHandler->handle();
         } catch (Exception $e) {
@@ -140,20 +141,14 @@ class Broadcast
         $this->logger->info(json_encode(['type' => 'emit', 'name' => $event, 'data' => $data]));
 
         try {
-//            $eventHandlerClass = $this->getEventHandlerClass($event);
-
             /** @var EventInterface|EventPublisherInterface|EventRoomInterface $eventHandler */
-//            $eventHandler = new $eventHandlerClass($data);
             $eventHandler = $this->container->get(sprintf('socketio.%s', $event));
-            $eventHandler->setPayload($data);
-
-            $eventHandlerClass = get_class($eventHandler);
 
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
             }
 
-            $eventHandler->setContainer($this->container);
+            $eventHandler->setPayload($data);
 
             if (false === $eventHandler instanceof EventPublisherInterface) {
                 throw new Exception('Event should implement EventPublisherInterface');
@@ -161,10 +156,11 @@ class Broadcast
 
             $data = $eventHandler->fire();
 
-            if (true === $eventHandler instanceof EventRoomInterface) {
+            if ($eventHandler instanceof EventRoomInterface) {
                 $data['room'] = $eventHandler->room();
             }
 
+            $eventHandlerClass = get_class($eventHandler);
             foreach ($eventHandlerClass::broadcastOn() as $channel) {
                 $this->publish($this->channelName($channel), [
                     'name' => $eventHandlerClass::name(),
@@ -218,24 +214,4 @@ class Broadcast
     {
         $this->redis->getClient(true)->publish($channel, json_encode($data));
     }
-
-//    /**
-//     * Get event handler service
-//     *
-//     * @param string $event
-//     *
-//     * @return string
-//     *
-//     * @throws Exception
-//     */
-//    protected function getEventHandlerClass(string $event): string
-//    {
-//        $eventHandlerClass = $this->manager->getList()[$event] ?? null;
-//
-//        if (null === $eventHandlerClass) {
-//            throw new Exception("Can not find $event");
-//        }
-//
-//        return $eventHandlerClass;
-//    }
 }
