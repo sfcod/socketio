@@ -7,6 +7,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Class WorkSocketIoCommand
@@ -56,6 +57,10 @@ class NodeJsServerCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
+        $io->success(sprintf('Worker daemon has been started.'));
+
         $process = $this->worker->nodeJs(
             $input->getOption('server') ?? getenv('SOCKET_IO_WS_SERVER'),
             $input->getOption('ssl') ?? getenv('SOCKET_IO_SSL') ? getenv('SOCKET_IO_SSL') : ''

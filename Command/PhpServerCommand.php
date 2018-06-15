@@ -61,7 +61,7 @@ class PhpServerCommand extends Command
         $io->success(sprintf('Worker daemon has been started.'));
 
         while (true) {
-            $this->worker->predis();
+            $this->worker->predis($io);
         }
     }
 }

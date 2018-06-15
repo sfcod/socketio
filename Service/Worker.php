@@ -3,6 +3,7 @@
 namespace SfCod\SocketIoBundle\Service;
 
 use Predis\Connection\ConnectionException;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
 /**
@@ -89,9 +90,9 @@ class Worker
     /**
      * Start predis
      */
-    public function predis()
+    public function predis(SymfonyStyle $io)
     {
-        $pubSubLoop = function () {
+        $pubSubLoop = function () use ($io) {
             /** @var \Predis\Client $client */
             $client = $this->redisDriver->getClient(true);
 
@@ -113,15 +114,15 @@ class Worker
             foreach ($pubSub as $message) {
                 switch ($message->kind) {
                     case 'subscribe':
-                        $this->output("Subscribed to {$message->channel}");
+                        $io->success("Subscribed to {$message->channel}");
                         break;
                     case 'message':
                         if ('control_channel' == $message->channel) {
                             if ('quit_loop' == $message->payload) {
-                                $this->output("Aborting pubsub loop...\n");
+                                $io->success("Aborting pubsub loop...\n");
                                 $pubSub->unsubscribe();
                             } else {
-                                $this->output("Received an unrecognized command: {$message->payload}\n");
+                                $io->success("Received an unrecognized command: {$message->payload}\n");
                             }
                         } else {
                             $payload = json_decode($message->payload, true);
