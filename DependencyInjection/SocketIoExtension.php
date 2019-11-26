@@ -145,7 +145,7 @@ class SocketIoExtension extends Extension
     {
         $redis = new Definition(RedisDriver::class);
         $redis->setArguments([
-            getenv('REDIS_URL'),
+            $container->getParameter('env(REDIS_URL)'),
         ]);
 
         $container->setDefinition(RedisDriver::class, $redis);
