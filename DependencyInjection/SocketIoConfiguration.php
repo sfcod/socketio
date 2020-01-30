@@ -22,8 +22,8 @@ class SocketIoConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('sfcod_socketio');
+        $treeBuilder = new TreeBuilder('sfcod_socketio');
+        $rootNode = $treeBuilder->getRootNode();
 
         $this->addNamespaces($rootNode);
 
