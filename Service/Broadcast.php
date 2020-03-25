@@ -2,7 +2,7 @@
 
 namespace SfCod\SocketIoBundle\Service;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use HTMLPurifier;
 use Psr\Log\LoggerInterface;
@@ -21,34 +21,29 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Broadcast
 {
     /**
+     * @var array
+     */
+    protected static $channels = [];
+    /**
      * @var RedisDriver
      */
     protected $redis;
-
     /**
      * @var LoggerInterface
      */
     protected $logger;
-
     /**
      * @var EventManager
      */
     protected $manager;
-
     /**
      * @var Process
      */
     protected $process;
-
     /**
-     * @var ContainerInterface
+     * @var EntityManagerInterface
      */
-    protected $container;
-
-    /**
-     * @var array
-     */
-    protected static $channels = [];
+    protected $entityManager;
 
     /**
      * Broadcast constructor.
@@ -58,13 +53,12 @@ class Broadcast
      * @param EventManager $manager
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RedisDriver $redis, EventManager $manager, LoggerInterface $logger, Process $process)
+    public function __construct(RedisDriver $redis, EventManager $manager, LoggerInterface $logger, Process $process)
     {
         $this->redis = $redis;
         $this->logger = $logger;
         $this->manager = $manager;
         $this->process = $process;
-        $this->container = $container;
     }
 
     /**
@@ -99,7 +93,7 @@ class Broadcast
     {
         try {
             /** @var EventInterface|EventSubscriberInterface|EventPolicyInterface $eventHandler */
-            $eventHandler = $this->container->get(sprintf('socketio.%s', $handler));
+            $eventHandler = $this->manager->resolve($handler); //container->get(sprintf('socketio.%s', $handler));
 
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
@@ -115,9 +109,8 @@ class Broadcast
                 return;
             }
 
-            if ($this->container->has('doctrine')) {
-                /** @var Connection $connection */
-                $connection = $this->container->get('doctrine')->getConnection();
+            if ($this->entityManager) {
+                $connection = $this->entityManager->getConnection();
                 $connection->close();
                 $connection->connect();
             }
@@ -173,6 +166,29 @@ class Broadcast
     }
 
     /**
+     * Publish data to redis channel
+     *
+     * @param string $channel
+     * @param array $data
+     */
+    protected function publish(string $channel, array $data)
+    {
+        $this->redis->getClient(true)->publish($channel, json_encode($data));
+    }
+
+    /**
+     * Prepare channel name
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function channelName(string $name): string
+    {
+        return $name . getenv('SOCKET_IO_NSP');
+    }
+
+    /**
      * Redis channels names
      *
      * @return array
@@ -192,26 +208,8 @@ class Broadcast
         return self::$channels;
     }
 
-    /**
-     * Prepare channel name
-     *
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function channelName(string $name): string
+    public function setDoctrine(EntityManagerInterface $entityManager)
     {
-        return $name . getenv('SOCKET_IO_NSP');
-    }
-
-    /**
-     * Publish data to redis channel
-     *
-     * @param string $channel
-     * @param array $data
-     */
-    protected function publish(string $channel, array $data)
-    {
-        $this->redis->getClient(true)->publish($channel, json_encode($data));
+        $this->entityManager = $entityManager;
     }
 }

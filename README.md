@@ -7,20 +7,17 @@ Use all power of socket.io in your Symfony project.
 
 #### Config
 
-###### Install node + additional npm
+###### Install node, after install npm
 ```bash
-    cd ~
-    curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
-    sudo bash nodesource_setup.sh
-    cd vendor/sfcod/soketio/server
-    npm install
+    npm install --prefix ./vendor/sfcod/socketio/Server
 ```
 
 ```yaml
-sfcod_socketio:
-    namespaces:
-        - 'App\SocketIo\Publisher'
-        - 'App\SocketIo\Subscriber'
+services:
+    App\SocketIo\:
+        resource: '../src/SocketIo/*'
+        tags: ['sfcod.socketio.event']
+
 ```
 ```dotenv
 ###> socketio config ###

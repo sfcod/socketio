@@ -2,7 +2,10 @@
 
 namespace SfCod\SocketIoBundle;
 
+use SfCod\QueueBundle\DependencyInjection\Compiler\JobCompilerPass;
+use SfCod\SocketIoBundle\DependencyInjection\Compiler\EventCompilerPass;
 use SfCod\SocketIoBundle\DependencyInjection\SocketIoExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -22,5 +25,17 @@ class SfCodSocketIoBundle extends Bundle
     public function getContainerExtension()
     {
         return new SocketIoExtension();
+    }
+
+    /**
+     * Add compiler pass
+     *
+     * @param ContainerBuilder $container
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new EventCompilerPass());
     }
 }

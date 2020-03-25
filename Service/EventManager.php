@@ -2,6 +2,12 @@
 
 namespace SfCod\SocketIoBundle\Service;
 
+use SfCod\QueueBundle\Base\JobInterface;
+use SfCod\QueueBundle\Exception\JobNotFoundException;
+use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Exception\EventDuplicateException;
+use SfCod\SocketIoBundle\Exception\EventNotFoundException;
+
 /**
  * Class EventManager
  *
@@ -12,25 +18,23 @@ namespace SfCod\SocketIoBundle\Service;
 class EventManager
 {
     /**
+     * List with all events
+     *
+     * @var array
+     */
+    protected $list = [];
+    /**
      * Array of events
      *
      * @var array
      */
     protected $namespaces;
-
     /**
      * Project root directory
      *
      * @var string
      */
     protected $rootDir;
-
-    /**
-     * List with all events
-     *
-     * @var array
-     */
-    protected static $list = [];
 
     /**
      * EventManager constructor.
@@ -59,12 +63,43 @@ class EventManager
                 foreach (glob(sprintf('%s/**.php', $alias)) as $file) {
                     $className = sprintf('%s\%s', $namespace, basename($file, '.php'));
                     if (method_exists($className, 'name')) {
-                        self::$list[$className::name()] = $className;
+                        $this->list[$className::name()] = $className;
                     }
                 }
             }
         }
 
-        return self::$list;
+        return $this->list;
+    }
+
+    /**
+     * Resolve the given class.
+     *
+     * @param string $name
+     *
+     * @return EventInterface
+     */
+    public function resolve(string $name): EventInterface
+    {
+        if (isset($this->list[$name])) {
+            return $this->list[$name];
+        }
+
+        throw new EventNotFoundException("Event handler '$name' not found.");
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @param string $id
+     * @param EventInterface $event
+     */
+    public function addEvent(EventInterface $event)
+    {
+        if (isset($this->list[$event::name()])) {
+            throw new EventDuplicateException("Event '$name' already exists.");
+        }
+
+        $this->list[$event::name()] = $event;
     }
 }

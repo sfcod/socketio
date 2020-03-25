@@ -64,8 +64,8 @@ class SocketIoExtension extends Extension
             $definition
                 ->setAutowired(true)
                 ->setAutoconfigured(true)
-                ->setPublic(true);
-            $container->setDefinition(sprintf('socketio.%s', $name), $definition);
+                ->setPublic(false);
+            $eventManager->addMethodCall('addEvent', [$definition]);
         }
     }
 
@@ -161,7 +161,6 @@ class SocketIoExtension extends Extension
     {
         $broadcast = new Definition(Broadcast::class);
         $broadcast->setArguments([
-            new Reference(ContainerInterface::class),
             new Reference(RedisDriver::class),
             new Reference(EventManager::class),
             new Reference(LoggerInterface::class),
