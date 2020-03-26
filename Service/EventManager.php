@@ -2,14 +2,12 @@
 
 namespace SfCod\SocketIoBundle\Service;
 
-use SfCod\QueueBundle\Base\JobInterface;
-use SfCod\QueueBundle\Exception\JobNotFoundException;
 use SfCod\SocketIoBundle\Events\EventInterface;
 use SfCod\SocketIoBundle\Exception\EventDuplicateException;
 use SfCod\SocketIoBundle\Exception\EventNotFoundException;
 
 /**
- * Class EventManager
+ * Class EventManager.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -18,19 +16,19 @@ use SfCod\SocketIoBundle\Exception\EventNotFoundException;
 class EventManager
 {
     /**
-     * List with all events
+     * List with all events.
      *
      * @var array
      */
     protected $list = [];
     /**
-     * Array of events
+     * Array of events.
      *
      * @var array
      */
     protected $namespaces;
     /**
-     * Project root directory
+     * Project root directory.
      *
      * @var string
      */
@@ -38,9 +36,6 @@ class EventManager
 
     /**
      * EventManager constructor.
-     *
-     * @param string $rootDir
-     * @param array $namespaces
      */
     public function __construct(string $rootDir, array $namespaces = [])
     {
@@ -49,9 +44,7 @@ class EventManager
     }
 
     /**
-     * Get events list
-     *
-     * @return array
+     * Get events list.
      */
     public function getList(): array
     {
@@ -74,10 +67,6 @@ class EventManager
 
     /**
      * Resolve the given class.
-     *
-     * @param string $name
-     *
-     * @return EventInterface
      */
     public function resolve(string $name): EventInterface
     {
@@ -89,10 +78,7 @@ class EventManager
     }
 
     /**
-     * @inheritDoc
-     *
      * @param string $id
-     * @param EventInterface $event
      */
     public function addEvent(EventInterface $event)
     {

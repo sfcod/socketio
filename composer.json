@@ -16,14 +16,15 @@
     ],
     "require": {
         "php": "^7.0",
-        "symfony/framework-bundle": "^4.0",
+        "symfony/framework-bundle": "^4.0|^5.0",
         "predis/predis": "^1.1",
         "symfony/monolog-bundle": "^3.1",
-        "symfony/dotenv": "^4.0",
-        "symfony/process": "^4.0"
+        "ezyang/htmlpurifier": "^4.0",
+        "symfony/dotenv": "^4.0|^5.0",
+        "symfony/process": "^4.0|^5.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.0",
+        "symfony/phpunit-bridge": "^4.0|^5.0",
         "friendsofphp/php-cs-fixer": "^2.8"
     },
     "autoload": {

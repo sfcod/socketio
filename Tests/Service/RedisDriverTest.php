@@ -7,7 +7,7 @@ use Predis\Client;
 use SfCod\SocketIoBundle\Service\RedisDriver;
 
 /**
- * Class RedisDriverTest
+ * Class RedisDriverTest.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -16,7 +16,7 @@ use SfCod\SocketIoBundle\Service\RedisDriver;
 class RedisDriverTest extends TestCase
 {
     /**
-     * Test redis client
+     * Test redis client.
      */
     public function testGetClient()
     {

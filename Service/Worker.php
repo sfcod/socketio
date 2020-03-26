@@ -7,7 +7,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
 /**
- * Class Worker
+ * Class Worker.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -37,11 +37,6 @@ class Worker
 
     /**
      * Worker constructor.
-     *
-     * @param EventManager $eventManager
-     * @param RedisDriver $redisDriver
-     * @param Broadcast $broadcast
-     * @param string $logDir
      */
     public function __construct(EventManager $eventManager, RedisDriver $redisDriver, Broadcast $broadcast, string $logDir)
     {
@@ -52,12 +47,7 @@ class Worker
     }
 
     /**
-     * Get node js process
-     *
-     * @param string $server
-     * @param string $ssl
-     *
-     * @return Process
+     * Get node js process.
      */
     public function nodeJs(string $server, string $ssl = ''): Process
     {
@@ -88,7 +78,7 @@ class Worker
     }
 
     /**
-     * Start predis
+     * Start predis.
      */
     public function predis(SymfonyStyle $io)
     {

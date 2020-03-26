@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class SocketIoConfiguration
+ * Class SocketIoConfiguration.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -37,9 +37,7 @@ class SocketIoConfiguration implements ConfigurationInterface
     }
 
     /**
-     * Add namespaces
-     *
-     * @param ArrayNodeDefinition $rootNode
+     * Add namespaces.
      */
     private function addNamespaces(ArrayNodeDefinition $rootNode)
     {

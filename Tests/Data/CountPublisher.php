@@ -17,7 +17,7 @@ class CountPublisher extends AbstractEvent implements EventInterface, EventPubli
     }
 
     /**
-     * Event name
+     * Event name.
      */
     public static function name(): string
     {
@@ -25,9 +25,7 @@ class CountPublisher extends AbstractEvent implements EventInterface, EventPubli
     }
 
     /**
-     * Emit client event
-     *
-     * @return array
+     * Emit client event.
      */
     public function fire(): array
     {

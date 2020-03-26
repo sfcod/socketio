@@ -3,7 +3,7 @@
 namespace SfCod\SocketIoBundle\Service;
 
 /**
- * Class Process
+ * Class Process.
  *
  * @package SfCod\SocketIoBundle
  */
@@ -15,14 +15,14 @@ class Process
     private static $_inWork = [];
 
     /**
-     * Run script name
+     * Run script name.
      *
      * @var string
      */
     private $scriptName;
 
     /**
-     * Bin folder path
+     * Bin folder path.
      *
      * @var string
      */
@@ -30,9 +30,6 @@ class Process
 
     /**
      * Process constructor.
-     *
-     * @param string $scriptName
-     * @param string $binPath
      */
     public function __construct(string $scriptName, string $binPath)
     {
@@ -41,9 +38,7 @@ class Process
     }
 
     /**
-     * Get parallel processes count
-     *
-     * @return int
+     * Get parallel processes count.
      */
     public function getParallelEnv(): int
     {
@@ -52,9 +47,6 @@ class Process
 
     /**
      * Run process. If more then limit then wait and try run process on more time.
-     *
-     * @param string $handle
-     * @param array $data
      *
      * @return \Symfony\Component\Process\Process
      */
@@ -72,7 +64,7 @@ class Process
     }
 
     /**
-     * In work processes
+     * In work processes.
      */
     private function inWork()
     {
@@ -90,11 +82,6 @@ class Process
 
     /**
      * Create cmd process and push to queue.
-     *
-     * @param string $handle
-     * @param array $data
-     *
-     * @return \Symfony\Component\Process\Process
      */
     private function push(string $handle, array $data): \Symfony\Component\Process\Process
     {

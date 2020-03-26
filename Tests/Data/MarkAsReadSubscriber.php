@@ -18,7 +18,7 @@ class MarkAsReadSubscriber extends AbstractEvent implements EventInterface, Even
     }
 
     /**
-     * Event name
+     * Event name.
      */
     public static function name(): string
     {
@@ -26,7 +26,7 @@ class MarkAsReadSubscriber extends AbstractEvent implements EventInterface, Even
     }
 
     /**
-     * Emit client event
+     * Emit client event.
      */
     public function handle()
     {

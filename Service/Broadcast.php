@@ -11,10 +11,9 @@ use SfCod\SocketIoBundle\events\EventPolicyInterface;
 use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\events\EventRoomInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class Broadcast
+ * Class Broadcast.
  *
  * @package SfCod\SocketIoBundle
  */
@@ -47,11 +46,6 @@ class Broadcast
 
     /**
      * Broadcast constructor.
-     *
-     * @param ContainerInterface $container
-     * @param RedisDriver $redis
-     * @param EventManager $manager
-     * @param LoggerInterface $logger
      */
     public function __construct(RedisDriver $redis, EventManager $manager, LoggerInterface $logger, Process $process)
     {
@@ -62,10 +56,7 @@ class Broadcast
     }
 
     /**
-     * Subscribe to event from client
-     *
-     * @param string $event
-     * @param array $data
+     * Subscribe to event from client.
      *
      * @return \Symfony\Component\Process\Process
      *
@@ -84,10 +75,7 @@ class Broadcast
     }
 
     /**
-     * Run process
-     *
-     * @param string $handler
-     * @param array $data
+     * Run process.
      */
     public function process(string $handler, array $data)
     {
@@ -115,6 +103,8 @@ class Broadcast
                 $connection->connect();
             }
 
+            $this->logger->info(json_encode(['type' => 'process', 'name' => $handler, 'data' => $data]));
+
             $eventHandler->handle();
         } catch (Exception $e) {
             $this->logger->error($e);
@@ -122,10 +112,7 @@ class Broadcast
     }
 
     /**
-     * Emit event to client
-     *
-     * @param string $event
-     * @param array $data
+     * Emit event to client.
      *
      * @throws Exception
      */
@@ -135,7 +122,7 @@ class Broadcast
 
         try {
             /** @var EventInterface|EventPublisherInterface|EventRoomInterface $eventHandler */
-            $eventHandler = $this->container->get(sprintf('socketio.%s', $event));
+            $eventHandler = $this->manager->resolve($event); // container->get(sprintf('socketio.%s', $event));
 
             if (false === $eventHandler instanceof EventInterface) {
                 throw new Exception('Event should implement EventInterface');
@@ -166,10 +153,7 @@ class Broadcast
     }
 
     /**
-     * Publish data to redis channel
-     *
-     * @param string $channel
-     * @param array $data
+     * Publish data to redis channel.
      */
     protected function publish(string $channel, array $data)
     {
@@ -177,11 +161,7 @@ class Broadcast
     }
 
     /**
-     * Prepare channel name
-     *
-     * @param string $name
-     *
-     * @return string
+     * Prepare channel name.
      */
     protected function channelName(string $name): string
     {
@@ -189,9 +169,7 @@ class Broadcast
     }
 
     /**
-     * Redis channels names
-     *
-     * @return array
+     * Redis channels names.
      */
     public function channels(): array
     {
@@ -208,7 +186,7 @@ class Broadcast
         return self::$channels;
     }
 
-    public function setDoctrine(EntityManagerInterface $entityManager)
+    public function setEntityManager(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }

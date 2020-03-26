@@ -2,22 +2,18 @@
 
 namespace SfCod\SocketIoBundle\DependencyInjection\Compiler;
 
-use SfCod\QueueBundle\Base\JobResolverInterface;
-use SfCod\QueueBundle\Service\JobQueue;
 use SfCod\SocketIoBundle\Service\EventManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class EventCompilerPass
+ * Class EventCompilerPass.
  */
 class EventCompilerPass implements CompilerPassInterface
 {
     /**
-     * Find all job handlers and mark them as public in case to work properly with job queue
-     *
-     * @param ContainerBuilder $container
+     * Find all job handlers and mark them as public in case to work properly with job queue.
      */
     public function process(ContainerBuilder $container)
     {

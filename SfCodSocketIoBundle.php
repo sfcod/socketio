@@ -2,14 +2,13 @@
 
 namespace SfCod\SocketIoBundle;
 
-use SfCod\QueueBundle\DependencyInjection\Compiler\JobCompilerPass;
 use SfCod\SocketIoBundle\DependencyInjection\Compiler\EventCompilerPass;
 use SfCod\SocketIoBundle\DependencyInjection\SocketIoExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class SfCodSocketIoBundle
+ * Class SfCodSocketIoBundle.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -18,9 +17,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class SfCodSocketIoBundle extends Bundle
 {
     /**
-     * Get bundle extension
+     * Get bundle extension.
      *
-     * @return null|SocketIoExtension|\Symfony\Component\DependencyInjection\Extension\ExtensionInterface
+     * @return SocketIoExtension|\Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null
      */
     public function getContainerExtension()
     {
@@ -28,9 +27,7 @@ class SfCodSocketIoBundle extends Bundle
     }
 
     /**
-     * Add compiler pass
-     *
-     * @param ContainerBuilder $container
+     * Add compiler pass.
      */
     public function build(ContainerBuilder $container)
     {

@@ -12,7 +12,7 @@ use SfCod\SocketIoBundle\Tests\Data\MarkAsReadSubscriber;
 use Symfony\Component\Process\Process;
 
 /**
- * Class BroadcastTest
+ * Class BroadcastTest.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -28,7 +28,7 @@ class BroadcastTest extends TestCase
     private $broadcast;
 
     /**
-     * Set up test
+     * Set up test.
      */
     protected function setUp()
     {
@@ -38,7 +38,7 @@ class BroadcastTest extends TestCase
     }
 
     /**
-     * Test on
+     * Test on.
      *
      * @throws \Exception
      */
@@ -50,7 +50,7 @@ class BroadcastTest extends TestCase
     }
 
     /**
-     * Test process
+     * Test process.
      */
     public function testProcess()
     {

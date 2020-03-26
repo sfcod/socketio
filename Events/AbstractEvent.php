@@ -3,7 +3,7 @@
 namespace SfCod\SocketIoBundle\Events;
 
 /**
- * Class AbstractEvent
+ * Class AbstractEvent.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -12,7 +12,7 @@ namespace SfCod\SocketIoBundle\Events;
 abstract class AbstractEvent implements EventInterface
 {
     /**
-     * Please, define '@property' and use it using magic __get() method instead of using $this->payload
+     * Please, define '@property' and use it using magic __get() method instead of using $this->payload.
      *
      * @var array
      */
@@ -20,8 +20,6 @@ abstract class AbstractEvent implements EventInterface
 
     /**
      * @param $data
-     *
-     * @return EventInterface
      */
     public function setPayload($data): EventInterface
     {
@@ -31,7 +29,7 @@ abstract class AbstractEvent implements EventInterface
     }
 
     /**
-     * Magic get
+     * Magic get.
      *
      * @param $name
      *

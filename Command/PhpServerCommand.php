@@ -23,8 +23,6 @@ class PhpServerCommand extends Command
 
     /**
      * PhpServerCommand constructor.
-     *
-     * @param Worker $worker
      */
     public function __construct(Worker $worker)
     {
@@ -34,7 +32,7 @@ class PhpServerCommand extends Command
     }
 
     /**
-     * Configure command
+     * Configure command.
      */
     protected function configure()
     {
@@ -45,12 +43,9 @@ class PhpServerCommand extends Command
     }
 
     /**
-     * Execute command
+     * Execute command.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int|null|void
+     * @return int|void|null
      *
      * @throws \Exception
      */

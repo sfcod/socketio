@@ -29,8 +29,6 @@ class ProcessCommand extends Command
 
     /**
      * ProcessCommand constructor.
-     *
-     * @param Broadcast $broadcast
      */
     public function __construct(Broadcast $broadcast)
     {
@@ -40,7 +38,7 @@ class ProcessCommand extends Command
     }
 
     /**
-     * Configure command
+     * Configure command.
      */
     protected function configure()
     {
@@ -53,12 +51,9 @@ class ProcessCommand extends Command
     }
 
     /**
-     * Execute command
+     * Execute command.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int|null|void
+     * @return int|void|null
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

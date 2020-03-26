@@ -5,7 +5,7 @@ namespace SfCod\SocketIoBundle\Service;
 use Predis\Client;
 
 /**
- * Class RedisDriver
+ * Class RedisDriver.
  *
  * @package SfCod\SocketIoBundle\drivers
  */
@@ -53,8 +53,6 @@ class RedisDriver
 
     /**
      * RedisDriver constructor.
-     *
-     * @param string $dsn
      */
     public function __construct(string $dsn = 'redis://localhost:6379')
     {
@@ -63,11 +61,7 @@ class RedisDriver
     }
 
     /**
-     * Get redis client
-     *
-     * @param bool $reset
-     *
-     * @return Client
+     * Get redis client.
      */
     public function getClient(bool $reset = false): Client
     {
@@ -85,17 +79,11 @@ class RedisDriver
         return $this->client;
     }
 
-    /**
-     * @return string
-     */
     public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * @return int
-     */
     public function getPort(): int
     {
         return $this->port;
@@ -134,7 +122,7 @@ class RedisDriver
     }
 
     /**
-     * Parse dsn and get all needed attributes
+     * Parse dsn and get all needed attributes.
      *
      * @param string $dsn
      */

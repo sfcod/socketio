@@ -2,6 +2,7 @@
 
 namespace SfCod\SocketIoBundle\DependencyInjection;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use SfCod\SocketIoBundle\Command\NodeJsServerCommand;
 use SfCod\SocketIoBundle\Command\PhpServerCommand;
@@ -15,13 +16,12 @@ use SfCod\SocketIoBundle\Service\Process;
 use SfCod\SocketIoBundle\Service\RedisDriver;
 use SfCod\SocketIoBundle\Service\Worker;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class SocketIoExtension
+ * Class SocketIoExtension.
  *
  * @author Virchenko Maksim <muslim1992@gmail.com>
  *
@@ -31,9 +31,6 @@ class SocketIoExtension extends Extension
 {
     /**
      * Loads a specific configuration.
-     *
-     * @param array $configs
-     * @param ContainerBuilder $container
      *
      * @throws \Exception
      */
@@ -70,20 +67,68 @@ class SocketIoExtension extends Extension
     }
 
     /**
-     * Get extension alias
-     *
-     * @return string
+     * Create driver.
      */
-    public function getAlias()
+    private function createDriver(array $config, ContainerBuilder $container)
     {
-        return 'sfcod_socketio';
+        $redis = new Definition(RedisDriver::class);
+        $redis->setArguments([
+            $container->getParameter('env(REDIS_URL)'),
+        ]);
+
+        $container->setDefinition(RedisDriver::class, $redis);
     }
 
     /**
-     * Create worker
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
+     * Create broadcast.
+     */
+    private function createBroadcast(array $config, ContainerBuilder $container)
+    {
+        $broadcast = new Definition(Broadcast::class);
+        $broadcast->setArguments([
+            new Reference(RedisDriver::class),
+            new Reference(EventManager::class),
+            new Reference(LoggerInterface::class),
+            new Reference(Process::class),
+        ]);
+
+        if ($container->getParameter('kernel.bundles')['DoctrineBundle'] ?? null) {
+            $broadcast->addMethodCall('setEntityManager', [new Reference(EntityManagerInterface::class)]);
+        }
+
+        $container->setDefinition(Broadcast::class, $broadcast);
+    }
+
+    /**
+     * Create event manager.
+     */
+    private function createEventManager(array $config, ContainerBuilder $container)
+    {
+        $eventManager = new Definition(EventManager::class);
+        $eventManager->setArguments([
+            $container->getParameter('kernel.root_dir'),
+            $config['namespaces'],
+        ]);
+
+        $container->setDefinition(EventManager::class, $eventManager);
+    }
+
+    /**
+     * Create process.
+     */
+    private function createProcess(array $config, ContainerBuilder $container)
+    {
+        $jobProcess = new Definition(Process::class);
+        $jobProcess->setArguments([
+            'console',
+            sprintf('%s/bin', $container->getParameter('kernel.project_dir')),
+        ]);
+
+        $container->setDefinition(Process::class, $jobProcess);
+    }
+
+    /**
+     * Create worker.
      *
      * @throws \Exception
      */
@@ -103,10 +148,7 @@ class SocketIoExtension extends Extension
     }
 
     /**
-     * Create command
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
+     * Create command.
      */
     private function createCommands(array $config, ContainerBuilder $container)
     {
@@ -136,71 +178,12 @@ class SocketIoExtension extends Extension
     }
 
     /**
-     * Create driver
+     * Get extension alias.
      *
-     * @param array $config
-     * @param ContainerBuilder $container
+     * @return string
      */
-    private function createDriver(array $config, ContainerBuilder $container)
+    public function getAlias()
     {
-        $redis = new Definition(RedisDriver::class);
-        $redis->setArguments([
-            $container->getParameter('env(REDIS_URL)'),
-        ]);
-
-        $container->setDefinition(RedisDriver::class, $redis);
-    }
-
-    /**
-     * Create broadcast
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
-    private function createBroadcast(array $config, ContainerBuilder $container)
-    {
-        $broadcast = new Definition(Broadcast::class);
-        $broadcast->setArguments([
-            new Reference(RedisDriver::class),
-            new Reference(EventManager::class),
-            new Reference(LoggerInterface::class),
-            new Reference(Process::class),
-        ]);
-
-        $container->setDefinition(Broadcast::class, $broadcast);
-    }
-
-    /**
-     * Create event manager
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
-    private function createEventManager(array $config, ContainerBuilder $container)
-    {
-        $eventManager = new Definition(EventManager::class);
-        $eventManager->setArguments([
-            $container->getParameter('kernel.root_dir'),
-            $config['namespaces'],
-        ]);
-
-        $container->setDefinition(EventManager::class, $eventManager);
-    }
-
-    /**
-     * Create process
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
-    private function createProcess(array $config, ContainerBuilder $container)
-    {
-        $jobProcess = new Definition(Process::class);
-        $jobProcess->setArguments([
-            'console',
-            sprintf('%s/bin', $container->getParameter('kernel.project_dir')),
-        ]);
-
-        $container->setDefinition(Process::class, $jobProcess);
+        return 'sfcod_socketio';
     }
 }

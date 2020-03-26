@@ -5,7 +5,7 @@ namespace SfCod\SocketIoBundle\Exception;
 use InvalidArgumentException;
 
 /**
- * Class EventNotFoundException
+ * Class EventNotFoundException.
  *
  * @author Orlov Alexey <aaorlov88@gmail.com>
  *

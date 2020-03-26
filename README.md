@@ -90,6 +90,14 @@ SOCKET_IO_NSP=redis
     
     class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface
     {
+
+        private $broadcast;
+    
+        public function __construct(Broadcast $broadcast)
+        {
+            $this->broadcast = $broadcast;
+        }
+
         /**
          * Changel name. For client side this is nsp.
          */
@@ -110,11 +118,11 @@ SOCKET_IO_NSP=redis
          * Emit client event
          * @return array
          */
-        public function handle(
+        public function handle()
         {
             // Mark notification as read
             // And call client update
-            $this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value']);
+            $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
         }
     }
 ```
@@ -136,6 +144,14 @@ You can have publisher and receiver in one event. If you need check data from cl
     
     class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface, EventPolicyInterface
     {
+
+        private $broadcast;
+    
+        public function __construct(Broadcast $broadcast)
+        {
+            $this->broadcast = $broadcast;
+        }
+
         /**
          * Changel name. For client side this is nsp.
          */
@@ -166,7 +182,7 @@ You can have publisher and receiver in one event. If you need check data from cl
         {
             // Mark notification as read
             // And call client update
-            $this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value']);
+            $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
         }
     }
 ```
@@ -202,7 +218,7 @@ Socket.io has room functional. If you need it, you should implement:
          */
         public function room(): string
         {
-            return 'user_id_' . $this->>userId;
+            return 'user_id_' . $this->userId;
         }            
             
         /**
@@ -230,5 +246,5 @@ Socket.io has room functional. If you need it, you should implement:
 ```
 Only user with id 10 will receive data
 ```php
-$this->container->get(Broadcast::class)->emit('update_notification_count', ['some key' => 'some value', 'userId' => 10]);
+$this->broadcast->emit('update_notification_count', ['some key' => 'some value', 'userId' => 10]);
 ```
