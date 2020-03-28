@@ -104,6 +104,7 @@ class SocketIoExtension extends Extension
         }
 
         if (isset($config['processMiddlewares'])) {
+            $processMiddlewares = [];
             foreach ($config['processMiddlewares'] as $processMiddlewareId) {
                 if (!$container->has($processMiddlewareId)) {
                     throw new RuntimeException(sprintf('Invalid middleware: service "%s" not found.', $processMiddlewareId));
