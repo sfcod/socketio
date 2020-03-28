@@ -10,6 +10,7 @@ use SfCod\SocketIoBundle\Command\ProcessCommand;
 use SfCod\SocketIoBundle\Events\EventInterface;
 use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
+use SfCod\SocketIoBundle\Middleware\Process\DoctrineReconnect;
 use SfCod\SocketIoBundle\Service\Broadcast;
 use SfCod\SocketIoBundle\Service\EventManager;
 use SfCod\SocketIoBundle\Service\Process;
@@ -17,6 +18,7 @@ use SfCod\SocketIoBundle\Service\RedisDriver;
 use SfCod\SocketIoBundle\Service\Worker;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -93,7 +95,23 @@ class SocketIoExtension extends Extension
         ]);
 
         if ($container->getParameter('kernel.bundles')['DoctrineBundle'] ?? null) {
-            $broadcast->addMethodCall('setEntityManager', [new Reference(EntityManagerInterface::class)]);
+            $doctrineReconnect = new Definition(DoctrineReconnect::class);
+            $doctrineReconnect->setArguments([
+                new Reference(EntityManagerInterface::class),
+            ]);
+
+            $container->setDefinition(DoctrineReconnect::class, $doctrineReconnect);
+        }
+
+        if (isset($config['processMiddlewares'])) {
+            foreach ($config['processMiddlewares'] as $processMiddlewareId) {
+                if (!$container->has($processMiddlewareId)) {
+                    throw new RuntimeException(sprintf('Invalid middleware: service "%s" not found.', $processMiddlewareId));
+                }
+                $processMiddlewares[] = new Reference($processMiddlewareId);
+            }
+
+            $broadcast->addMethodCall('setProcessMiddlewares', [$processMiddlewares]);
         }
 
         $container->setDefinition(Broadcast::class, $broadcast);

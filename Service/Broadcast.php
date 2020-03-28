@@ -2,7 +2,6 @@
 
 namespace SfCod\SocketIoBundle\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use HTMLPurifier;
 use Psr\Log\LoggerInterface;
@@ -11,6 +10,7 @@ use SfCod\SocketIoBundle\events\EventPolicyInterface;
 use SfCod\SocketIoBundle\Events\EventPublisherInterface;
 use SfCod\SocketIoBundle\events\EventRoomInterface;
 use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
+use SfCod\SocketIoBundle\Middleware\Process\ProcessMiddlewareInterface;
 
 /**
  * Class Broadcast.
@@ -23,6 +23,10 @@ class Broadcast
      * @var array
      */
     protected static $channels = [];
+    /**
+     * @var ProcessMiddlewareInterface[]
+     */
+    protected $processMiddlewares = [];
     /**
      * @var RedisDriver
      */
@@ -39,10 +43,6 @@ class Broadcast
      * @var Process
      */
     protected $process;
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
 
     /**
      * Broadcast constructor.
@@ -93,14 +93,18 @@ class Broadcast
                 throw new Exception('Event should implement EventSubscriberInterface');
             }
 
-            if (true === $eventHandler instanceof EventPolicyInterface && false === $eventHandler->can($data)) {
-                return;
+            foreach ($this->processMiddlewares as $processMiddleware) {
+                if (false === $processMiddleware($handler, $data)) {
+                    $this->logger->info(json_encode(['type' => 'process_terminated', 'name' => $handler, 'data' => $data]));
+
+                    return;
+                }
             }
 
-            if ($this->entityManager) {
-                $connection = $this->entityManager->getConnection();
-                $connection->close();
-                $connection->connect();
+            if (true === $eventHandler instanceof EventPolicyInterface && false === $eventHandler->can($data)) {
+                $this->logger->info(json_encode(['type' => 'process_policy_forbidden', 'name' => $handler, 'data' => $data]));
+
+                return;
             }
 
             $this->logger->info(json_encode(['type' => 'process', 'name' => $handler, 'data' => $data]));
@@ -186,8 +190,11 @@ class Broadcast
         return self::$channels;
     }
 
-    public function setEntityManager(EntityManagerInterface $entityManager)
+    /**
+     * @param ProcessMiddlewareInterface[] $processMiddlewares
+     */
+    public function setProcessMiddlewares($processMiddlewares)
     {
-        $this->entityManager = $entityManager;
+        $this->processMiddlewares = $processMiddlewares;
     }
 }

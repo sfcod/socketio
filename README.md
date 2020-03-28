@@ -19,6 +19,15 @@ services:
         tags: ['sfcod.socketio.event']
 
 ```
+###### Process Middlewares
+If you use doctrine, then you can connect "doctrine reconnect", then it will be reconnect for each process.
+```yaml
+sfcod_socketio:
+    processMiddlewares:
+        - 'SfCod\SocketIoBundle\Middleware\Process\DoctrineReconnect'
+
+```
+
 ```dotenv
 ###> socketio config ###
 SOCKET_IO_WS_SERVER=localhost:1358

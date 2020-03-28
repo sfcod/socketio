@@ -46,6 +46,9 @@ class SocketIoConfiguration implements ConfigurationInterface
                 ->arrayNode('namespaces')
                     ->scalarPrototype()->end()
                 ->end()
+                ->arrayNode('processMiddlewares')
+                    ->scalarPrototype()->end()
+                ->end()
             ->end();
     }
 }
