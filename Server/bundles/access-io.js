@@ -15,13 +15,13 @@ class AccessIO {
     }
 
     /**
-     * Every request sent faster than 2ms will return false, otherwise the handler get run.
+     * Every request sent faster than 3ms (SOCKET_IO_SPEED_LIMIT) will return false, otherwise the handler get run.
      * @param name Event name
      * @returns {boolean}
      */
     isDdos(name) {
         let data = (this.socket.accessIo || {})[name] || {};
-        
+
         if (this.getRequestLimit() <= 0) {
             return false;
         }

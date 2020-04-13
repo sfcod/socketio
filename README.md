@@ -251,7 +251,7 @@ Socket.io has room functional. If you need it, you should implement:
         console.log(data)
     });
     // You can leave room
-    socket.emit('leave');
+    socket.emit('leave', {room: 'user_id_10'});
 ```
 Only user with id 10 will receive data
 ```php

@@ -1,4 +1,3 @@
-const RoomIO = require('./room-io');
 const AccessIO = require('./access-io');
 const logger = require('./logger');
 const util = require('util');
@@ -51,7 +50,6 @@ class RedisIO {
         let nspio = this.io.of('/' + nsp);
 
         nspio.on('connection', (socket) => {
-            socket.roomIO = new RoomIO(socket);
             socket.access = new AccessIO(socket);
 
             socket = this.wildcard(socket);
@@ -64,20 +62,19 @@ class RedisIO {
                 if (true === socket.access.can(name)) {
                     switch (name) {
                         case 'join' :
-                            socket.roomIO.join(data.room);
+                            socket.join(data.name);
                             break;
                         case 'leave':
-                            socket.roomIO.leave();
+                            socket.leave(data.name);
                             break;
                         default:
-                            data.room = socket.roomIO.name();
                             this.pub.publish(channel + '.io', JSON.stringify({
                                 name: name,
                                 data: data
                             }));
                     }
                 }else{
-                    throw new Error(util.format('Socket %s "can not get access/speed limit", nsp: %s, room: %s, name: %s, data: %s', socket.id, nsp, socket.roomIO.name(), name, JSON.stringify(data)));
+                    throw new Error(util.format('Socket %s "can not get access/speed limit", nsp: %s, name: %s, data: %s', socket.id, nsp, name, JSON.stringify(data)));
                 }
             });
         });
