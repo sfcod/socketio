@@ -62,10 +62,10 @@ class RedisIO {
                 if (true === socket.access.can(name)) {
                     switch (name) {
                         case 'join' :
-                            socket.join(data.name);
+                            socket.join(data.room);
                             break;
                         case 'leave':
-                            socket.leave(data.name);
+                            socket.leave(data.room);
                             break;
                         default:
                             this.pub.publish(channel + '.io', JSON.stringify({
