@@ -73,6 +73,10 @@ class RedisIO {
                                 data: data
                             }));
                     }
+                    logger.info('wildcard', {
+                        name: name,
+                        data: data
+                    });
                 }else{
                     throw new Error(util.format('Socket %s "can not get access/speed limit", nsp: %s, name: %s, data: %s', socket.id, nsp, name, JSON.stringify(data)));
                 }
@@ -96,6 +100,12 @@ class RedisIO {
         } else {
             this.io.of('/' + nsp).emit(event.name, event.data);
         }
+
+        logger.info('emit', {
+            nsp: nsp,
+            room: room || '',
+            data: event.data
+        });
     };
 
     /**
