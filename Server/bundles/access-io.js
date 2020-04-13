@@ -11,7 +11,7 @@ class AccessIO {
      * @returns {number}
      */
     getRequestLimit() {
-        return process.env.SOCKET_IO_SPEED_LIMIT || 3;
+        return process.env.SOCKET_IO_SPEED_LIMIT || 0;
     }
 
     /**
