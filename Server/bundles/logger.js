@@ -1,4 +1,5 @@
 const winston = require('winston');
+const fs = require('fs');
 const args = require('./args');
 const isDevEnv = (process.env.NODE_ENV || '') === 'dev'
 
@@ -12,12 +13,12 @@ const logger = new (winston.Logger)({
             maxFiles: 5,
             colorize: false,
         }),
-        // new winston.transports.Console({
-        //     level: isDevEnv ? 'info' : 'error',
-        //     handleExceptions: true,
-        //     json: false,
-        //     colorize: true,
-        // })
+        new winston.transports.Console({
+            level: isDevEnv ? 'info' : 'error',
+            handleExceptions: true,
+            json: false,
+            colorize: true,
+        })
     ],
     exceptionHandlers: [
         new winston.transports.File({filename: args.runtime + '/exceptions.log'})

@@ -1,4 +1,4 @@
-// Const
+const path = require('path');
 const ArgumentParser = require('argparse').ArgumentParser;
 const parser = new ArgumentParser({
     version: '1.0.0',
@@ -45,7 +45,7 @@ parser.addArgument(
 parser.addArgument(
     ['-runtime', '--runtime'],
     {
-        defaultValue: __dirname,
+        defaultValue: path.join(__dirname,'../', 'logs'),
         help: 'Runtime path in the app'
     }
 );
