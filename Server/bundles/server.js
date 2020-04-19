@@ -5,10 +5,6 @@ const fs = require('fs');
 const ssl = JSON.parse(args.ssl);
 const dotenv = require('dotenv').config();
 
-if (!fs.existsSync(args.runtime)){
-    fs.mkdirSync(args.runtime);
-}
-
 const server = args.ssl ? https.createServer({
     key: fs.readFileSync(ssl.key),
     cert: fs.readFileSync(ssl.cert)

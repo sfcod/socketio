@@ -1,13 +1,13 @@
 const winston = require('winston');
-const fs = require('fs');
 const args = require('./args');
-const isDevEnv = (process.env.NODE_ENV || '') === 'dev'
+const isDevEnv = (process.env.SOCKET_IO_ENV || '') === 'dev'
 
 const logger = new (winston.Logger)({
     transports: [
         new winston.transports.File({
             filename: args.runtime + '/all-logs.log',
             level: isDevEnv ? 'info' : 'error',
+            handleExceptions: true,
             json: true,
             maxsize: 5242880, // 5MB
             maxFiles: 5,

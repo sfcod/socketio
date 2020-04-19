@@ -243,6 +243,24 @@ Socket.io has room functional. If you need it, you should implement:
     }
 ```
 
+JWT token auth. Put SOCKET_IO_AUTH_TOKEN_PATH OR SOCKET_IO_AUTH_TOKEN_VALUE
+```dotenv
+#Public jwt token key path (Will be join with base path)
+SOCKET_IO_AUTH_TOKEN_PATH='/config/jwt/public.pem'
+#Public key value
+SOCKET_IO_AUTH_TOKEN_VALUE='public key value'
+#You can change token name. Default name is 'token'
+SOCKET_IO_AUTH_TOKEN_NAME='token'
+```
+```js
+    var socket = io('{your_host_address}:1367/notifications',  {
+        query: {
+            token: 'yourTokenHere',
+        },
+     });
+```
+
+Room example
 ```js
     var socket = io('{your_host_address}:1367/notifications');
     socket.emit('join', {room: 'user_id_10'});

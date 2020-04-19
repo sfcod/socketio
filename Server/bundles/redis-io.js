@@ -68,6 +68,8 @@ class RedisIO {
                             socket.leave(data.room);
                             break;
                         default:
+                            const token = socket.handshake.query[`${process.env.SOCKET_IO_AUTH_TOKEN_NAME || 'token'}`] || undefined;
+                            data = token ? {...data, token} : data;
                             this.pub.publish(channel + '.io', JSON.stringify({
                                 name: name,
                                 data: data
@@ -77,7 +79,7 @@ class RedisIO {
                         name: name,
                         data: data
                     });
-                }else{
+                } else {
                     throw new Error(util.format('Socket %s "can not get access/speed limit", nsp: %s, name: %s, data: %s', socket.id, nsp, name, JSON.stringify(data)));
                 }
             });
