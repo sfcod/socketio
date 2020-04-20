@@ -9,7 +9,7 @@ Use all power of socket.io in your Symfony project.
 
 ###### Install node, after install npm
 ```bash
-    npm install --prefix ./vendor/sfcod/socketio/Server
+npm install --prefix ./vendor/sfcod/socketio/Server
 ```
 
 ```yaml
@@ -27,118 +27,135 @@ sfcod_socketio:
         - 'SfCod\SocketIoBundle\Middleware\Process\DoctrineReconnect'
 
 ```
-
+###### Dotenv
 ```dotenv
 ###> socketio config ###
 SOCKET_IO_WS_SERVER=localhost:1358
 SOCKET_IO_WS_CLIENT=localhost:1358
 SOCKET_IO_SSL='' || '{"key":"path to key", "cert":"path to cert"}'
 SOCKET_IO_NSP=redis
+#Nodejs server will write logs
+SOCKET_IO_ENV=dev
 ###< socketio config ###
 ```
-
+JWT token auth. Put SOCKET_IO_AUTH_TOKEN_PATH OR SOCKET_IO_AUTH_TOKEN_VALUE
+```dotenv
+#Public jwt key path (Will be joined with base path)
+SOCKET_IO_AUTH_TOKEN_PATH='/config/jwt/public.pem'
+#Public jwt key value
+SOCKET_IO_AUTH_TOKEN_VALUE='public key value'
+#The token query key is 'token'. But can be changed as
+SOCKET_IO_AUTH_TOKEN_NAME='token'
+```
+```js
+var socket = io('{your_host_address}:1367/notifications',  {
+    query: {
+        token: 'your_token_here',
+    },
+ });
+```
 #### Usage
 
 ###### Start nodejs server
 ```bash
-    php bin/console socket-io:node-js-server
+php bin/console socket-io:node-js-server
 ```
 ###### Start php server
 ```bash
-    php bin/console socket-io:php-server
+php bin/console socket-io:php-server
 ```
 
 ###### Create publisher from server to client
 ```php
-    use SfCod\SocketIoBundle\Events\EventInterface;
-    use SfCod\SocketIoBundle\Events\EventPublisherInterface;
-    use SfCod\SocketIoBundle\Events\AbstractEvent;
-    
-    class CountEvent extends AbstractEvent implements EventInterface, EventPublisherInterface
+use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Events\EventPublisherInterface;
+use SfCod\SocketIoBundle\Events\AbstractEvent;
+
+class CountEvent extends AbstractEvent implements EventInterface, EventPublisherInterface
+{
+    /**
+     * Changel name. For client side this is nsp.
+     */
+    public static function broadcastOn(): array
     {
-        /**
-         * Changel name. For client side this is nsp.
-         */
-        public static function broadcastOn(): array
-        {
-            return ['notifications'];
-        }
-    
-        /**
-         * Event name
-         */
-        public static function name(): string
-        {
-            return 'update_notification_count';
-        }
-            
-        /**
-         * Emit client event
-         * @return array
-         */
-        public function fire(): array
-        {
-            return [
-                'count' => 10,
-            ];
-        }
+        return ['notifications'];
     }
+
+    /**
+     * Event name
+     */
+    public static function name(): string
+    {
+        return 'update_notification_count';
+    }
+        
+    /**
+     * Emit client event
+     * @return array
+     */
+    public function fire(): array
+    {
+        return [
+            'count' => 10,
+        ];
+    }
+}
 ```
 ```js
-    var socket = io('{your_host_address}:1367/notifications');
-    socket.on('update_notification_count', function(data){
-        console.log(data)
-    });
+var socket = io('{your_host_address}:1367/notifications');
+socket.on('update_notification_count', function(data){
+    console.log(data)
+});
 ```
 
 ###### Create receiver from client to server
 ```php
-    use SfCod\SocketIoBundle\Events\EventInterface;
-    use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
-    use SfCod\SocketIoBundle\Events\AbstractEvent;
-    
-    class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface
+use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
+use SfCod\SocketIoBundle\Events\AbstractEvent;
+
+class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface
+{
+
+    private $broadcast;
+
+    public function __construct(Broadcast $broadcast)
     {
-
-        private $broadcast;
-    
-        public function __construct(Broadcast $broadcast)
-        {
-            $this->broadcast = $broadcast;
-        }
-
-        /**
-         * Changel name. For client side this is nsp.
-         */
-        public static function broadcastOn(): array
-        {
-            return ['notifications'];
-        }
-    
-        /**
-         * Event name
-         */
-        public static function name(): string
-        {
-            return 'mark_as_read_notification';
-        }
-            
-        /**
-         * Emit client event
-         * @return array
-         */
-        public function handle()
-        {
-            // Mark notification as read
-            // And call client update
-            $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
-        }
+        $this->broadcast = $broadcast;
     }
+
+    /**
+     * Changel name. For client side this is nsp.
+     */
+    public static function broadcastOn(): array
+    {
+        return ['notifications'];
+    }
+
+    /**
+     * Event name
+     */
+    public static function name(): string
+    {
+        return 'mark_as_read_notification';
+    }
+        
+    /**
+     * Emit client event
+     * @return array
+     */
+    public function handle()
+    {
+        // Mark notification as read
+        // And call client update
+        $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
+    }
+}
 ```
 
 ```js
-    var socket = io('{your_host_address}:1367/notifications');
-    socket.emit('mark_as_read_notification', {id: 10});
+var socket = io('{your_host_address}:1367/notifications');
+socket.emit('mark_as_read_notification', {id: 10});
 ```
 
 You can have publisher and receiver in one event. If you need check data from client to server you should use: 
@@ -146,130 +163,113 @@ You can have publisher and receiver in one event. If you need check data from cl
 
 ###### Receiver with checking from client to server
 ```php
-    use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
-    use SfCod\SocketIoBundle\Events\EventInterface;
-    use SfCod\SocketIoBundle\Events\EventPolicyInterface;
-    use SfCod\SocketIoBundle\Events\AbstractEvent;
-    
-    class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface, EventPolicyInterface
+use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
+use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Events\EventPolicyInterface;
+use SfCod\SocketIoBundle\Events\AbstractEvent;
+
+class MarkAsReadEvent extends AbstractEvent implements EventInterface, EventSubscriberInterface, EventPolicyInterface
+{
+
+    private $broadcast;
+
+    public function __construct(Broadcast $broadcast)
     {
-
-        private $broadcast;
-    
-        public function __construct(Broadcast $broadcast)
-        {
-            $this->broadcast = $broadcast;
-        }
-
-        /**
-         * Changel name. For client side this is nsp.
-         */
-        public static function broadcastOn(): array
-        {
-            return ['notifications'];
-        }
-    
-        /**
-         * Event name
-         */
-        public static function name(): string
-        {
-            return 'mark_as_read_notification';
-        }
-         
-        public function can($data): bool
-        {
-            // Check data from client    
-            return true;
-        }        
-        
-        /**
-         * Emit client event
-         * @return array
-         */
-        public function handle()
-        {
-            // Mark notification as read
-            // And call client update
-            $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
-        }
+        $this->broadcast = $broadcast;
     }
+
+    /**
+     * Changel name. For client side this is nsp.
+     */
+    public static function broadcastOn(): array
+    {
+        return ['notifications'];
+    }
+
+    /**
+     * Event name
+     */
+    public static function name(): string
+    {
+        return 'mark_as_read_notification';
+    }
+     
+    public function can($data): bool
+    {
+        // Check data from client    
+        return true;
+    }        
+    
+    /**
+     * Emit client event
+     * @return array
+     */
+    public function handle()
+    {
+        // Mark notification as read
+        // And call client update
+        $this->broadcast->emit('update_notification_count', ['some key' => 'some value']);
+    }
+}
 ```
 
 Socket.io has room functional. If you need it, you should implement:
 - EventRoomInterface
 ```php
-    use SfCod\SocketIoBundle\Events\EventPubscriberInterface;
-    use SfCod\SocketIoBundle\Events\EventInterface;
-    use SfCod\SocketIoBundle\Events\EventRoomInterface;
-    
-    class CountEvent extends AbstractEvent implements EventInterface, EventPubscriberInterface, EventRoomInterface
-    {           
-        /**
-         * Changel name. For client side this is nsp.
-         */
-        public static function broadcastOn(): array
-        {
-            return ['notifications'];
-        }
-    
-        /**
-         * Event name
-         */
-        public static function name(): string
-        {
-            return 'update_notification_count';
-        }
-           
-        /**
-         * Socket.io room
-         * @return string
-         */
-        public function room(): string
-        {
-            return 'user_id_' . $this->userId;
-        }            
-            
-        /**
-         * Emit client event
-         * @return array
-         */
-        public function fire(): array
-        {                        
-            return [
-                'count' => 10,
-            ];
-        }
-    }
-```
+use SfCod\SocketIoBundle\Events\EventPubscriberInterface;
+use SfCod\SocketIoBundle\Events\EventInterface;
+use SfCod\SocketIoBundle\Events\EventRoomInterface;
 
-JWT token auth. Put SOCKET_IO_AUTH_TOKEN_PATH OR SOCKET_IO_AUTH_TOKEN_VALUE
-```dotenv
-#Public jwt token key path (Will be join with base path)
-SOCKET_IO_AUTH_TOKEN_PATH='/config/jwt/public.pem'
-#Public key value
-SOCKET_IO_AUTH_TOKEN_VALUE='public key value'
-#You can change token name. Default name is 'token'
-SOCKET_IO_AUTH_TOKEN_NAME='token'
-```
-```js
-    var socket = io('{your_host_address}:1367/notifications',  {
-        query: {
-            token: 'yourTokenHere',
-        },
-     });
+class CountEvent extends AbstractEvent implements EventInterface, EventPubscriberInterface, EventRoomInterface
+{           
+    /**
+     * Changel name. For client side this is nsp.
+     */
+    public static function broadcastOn(): array
+    {
+        return ['notifications'];
+    }
+
+    /**
+     * Event name
+     */
+    public static function name(): string
+    {
+        return 'update_notification_count';
+    }
+       
+    /**
+     * Socket.io room
+     * @return string
+     */
+    public function room(): string
+    {
+        return 'user_id_' . $this->userId;
+    }            
+        
+    /**
+     * Emit client event
+     * @return array
+     */
+    public function fire(): array
+    {                        
+        return [
+            'count' => 10,
+        ];
+    }
+}
 ```
 
 Room example
 ```js
-    var socket = io('{your_host_address}:1367/notifications');
-    socket.emit('join', {room: 'user_id_10'});
-    // Now you will receive data from 'room-1'
-    socket.on('update_notification_count', function(data){
-        console.log(data)
-    });
-    // You can leave room
-    socket.emit('leave', {room: 'user_id_10'});
+var socket = io('{your_host_address}:1367/notifications');
+socket.emit('join', {room: 'user_id_10'});
+// Now you will receive data from 'room-1'
+socket.on('update_notification_count', function(data){
+    console.log(data)
+});
+// You can leave room
+socket.emit('leave', {room: 'user_id_10'});
 ```
 Only user with id 10 will receive data
 ```php
