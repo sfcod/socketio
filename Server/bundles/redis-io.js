@@ -40,6 +40,10 @@ class RedisIO {
         return channel.replace(this.nsp, '');
     }
 
+    getSocketId(socket) {
+        return socket.id.split("#")[1];
+    }
+
     /**
      * on connection
      * @param channel
@@ -53,12 +57,30 @@ class RedisIO {
             socket.access = new AccessIO(socket);
 
             socket = this.wildcard(socket);
+
+            const token = socket.handshake.query[`${process.env.SOCKET_IO_AUTH_TOKEN_NAME || 'token'}`] || undefined;
+            const event = (name) => {
+                const data = token ? {...{socketId: this.getSocketId(socket)}, token} : {socketId: this.getSocketId(socket)};
+
+                this.pub.publish(channel + '.io', JSON.stringify({
+                    name: name,
+                    data: data
+                }));
+
+                logger.info('event', {
+                    name: name,
+                    data: data
+                });
+            }
+
+            event('connection');
+
             socket.on('disconnect', () => {
-                // socket.io disconnect
+                event('disconnect');
             });
 
-            socket.on('*', (name, data) => {
-                data = data || {};
+            socket.on('*', (name, data = {}) => {
+                data = {...data, socketId: this.getSocketId(socket)};
                 if (true === socket.access.can(name)) {
                     switch (name) {
                         case 'join' :
@@ -67,14 +89,14 @@ class RedisIO {
                         case 'leave':
                             socket.leave(data.room);
                             break;
-                        default:
-                            const token = socket.handshake.query[`${process.env.SOCKET_IO_AUTH_TOKEN_NAME || 'token'}`] || undefined;
-                            data = token ? {...data, token} : data;
-                            this.pub.publish(channel + '.io', JSON.stringify({
-                                name: name,
-                                data: data
-                            }));
                     }
+                    // Send to php server all events
+                    data = token ? {...data, token} : data;
+                    this.pub.publish(channel + '.io', JSON.stringify({
+                        name: name,
+                        data: data
+                    }));
+
                     logger.info('wildcard', {
                         name: name,
                         data: data
@@ -96,11 +118,24 @@ class RedisIO {
             room = event.data.room,
             nsp = this.getIoNsp(channel);
 
-        if (room) {
-            delete event.data.room;
-            this.io.of('/' + nsp).to(room).emit(event.name, event.data);
-        } else {
-            this.io.of('/' + nsp).emit(event.name, event.data);
+        switch (event.name) {
+            case 'join' :
+                if (data.socketId && this.io.sockets.sockets[data.socketId]) {
+                    this.io.sockets.sockets[data.socketId].join(data.room);
+                }
+                break;
+            case 'leave':
+                if (data.socketId && this.io.sockets.sockets[data.socketId]) {
+                    this.io.sockets.sockets[data.socketId].leave(data.room);
+                }
+                break;
+            default:
+                if (room) {
+                    delete event.data.room;
+                    this.io.of('/' + nsp).to(room).emit(event.name, event.data);
+                } else {
+                    this.io.of('/' + nsp).emit(event.name, event.data);
+                }
         }
 
         logger.info('emit', {
