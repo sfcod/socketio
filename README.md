@@ -17,18 +17,18 @@ services:
     App\SocketIo\:
         resource: '../src/SocketIo/*'
         tags: ['sfcod.socketio.event']
-        # If you want ovveride default JoinHandler/LeaveHandler. For example, add some condition for join/leave a room.
+        # If you want override default JoinHandler/LeaveHandler. For example, add some condition for join/leave a room.
         exclude:
             - '../src/SocketIo/JoinHandler.php' # Optional
             - '../src/SocketIo/LeaveHandler.php' # Optional
         
   
-    # If you want ovveride default JoinHandler
+    # If you want override default JoinHandler
     SfCod\SocketIoBundle\Service\JoinHandler:
         class: App\SocketIo\JoinHandler
         tags: ['sfcod.socketio.event']
 
-    # If you want ovveride default LeaveHandler
+    # If you want override default LeaveHandler
     SfCod\SocketIoBundle\Service\LeaveHandler:
         class: App\SocketIo\LeaveHandler
         tags: ['sfcod.socketio.event']
