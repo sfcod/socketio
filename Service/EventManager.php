@@ -83,7 +83,7 @@ class EventManager
     public function addEvent(EventInterface $event)
     {
         if (isset($this->list[$event::name()])) {
-            throw new EventDuplicateException("Event '$name' already exists.");
+            throw new EventDuplicateException("Event '{$event::name()}' already exists.");
         }
 
         $this->list[$event::name()] = $event;

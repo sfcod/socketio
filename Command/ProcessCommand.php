@@ -60,5 +60,7 @@ class ProcessCommand extends Command
         $handler = $input->getOption('handler');
 
         $this->broadcast->process($handler, @unserialize($input->getOption('data')) ?? []);
+
+        return 0;
     }
 }

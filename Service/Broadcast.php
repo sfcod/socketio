@@ -111,7 +111,7 @@ class Broadcast
             $this->logger->info(json_encode(['type' => 'process', 'name' => $handler, 'data' => $data]));
 
             $eventHandler->handle();
-        } catch (EventNotFoundException $e){
+        } catch (EventNotFoundException $e) {
             $this->logger->info($e);
         } catch (Exception $e) {
             $this->logger->error($e);
@@ -154,7 +154,7 @@ class Broadcast
                     'data' => $data,
                 ]);
             }
-        } catch (EventNotFoundException $e){
+        } catch (EventNotFoundException $e) {
             $this->logger->info($e);
         } catch (Exception $e) {
             $this->logger->error($e);

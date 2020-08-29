@@ -40,18 +40,14 @@ class RedisIO {
         return channel.replace(this.nsp, '');
     }
 
-    getSocketId(socket) {
-        return socket.id.split("#")[1];
-    }
-
     /**
      * on connection
      * @param channel
      * @param data
      */
     on(channel, data) {
-        let nsp = this.getIoNsp(channel);
-        let nspio = this.io.of('/' + nsp);
+        let nsp = '/' + this.getIoNsp(channel);
+        let nspio = this.io.of(nsp);
 
         nspio.on('connection', (socket) => {
             socket.access = new AccessIO(socket);
@@ -60,7 +56,7 @@ class RedisIO {
 
             const token = socket.handshake.query[`${process.env.SOCKET_IO_AUTH_TOKEN_NAME || 'token'}`] || undefined;
             const event = (name) => {
-                const data = token ? {...{socketId: this.getSocketId(socket)}, token} : {socketId: this.getSocketId(socket)};
+                const data = token ? {...{socketId: socket.id}, token} : {socketId: socket.id};
 
                 this.pub.publish(channel + '.io', JSON.stringify({
                     name: name,
@@ -80,16 +76,17 @@ class RedisIO {
             });
 
             socket.on('*', (name, data = {}) => {
-                data = {...data, socketId: this.getSocketId(socket)};
+                data = {...data, socketId: socket.id};
                 if (true === socket.access.can(name)) {
-                    switch (name) {
-                        case 'join' :
-                            socket.join(data.room);
-                            break;
-                        case 'leave':
-                            socket.leave(data.room);
-                            break;
-                    }
+                    // Moved to controlled php handlers
+                    // switch (name) {
+                    //     case 'join' :
+                    //         socket.join(data.room);
+                    //         break;
+                    //     case 'leave':
+                    //         socket.leave(data.room);
+                    //         break;
+                    // }
                     // Send to php server all events
                     data = token ? {...data, token} : data;
                     this.pub.publish(channel + '.io', JSON.stringify({
@@ -99,7 +96,8 @@ class RedisIO {
 
                     logger.info('wildcard', {
                         name: name,
-                        data: data
+                        data: data,
+                        nsp: nsp,
                     });
                 } else {
                     throw new Error(util.format('Socket %s "can not get access/speed limit", nsp: %s, name: %s, data: %s', socket.id, nsp, name, JSON.stringify(data)));
@@ -116,30 +114,35 @@ class RedisIO {
     emit(channel, data) {
         let event = this.parseEvent(data),
             room = event.data.room,
-            nsp = this.getIoNsp(channel);
+            nsp = '';
 
         switch (event.name) {
             case 'join' :
-                if (data.socketId && this.io.sockets.sockets[data.socketId]) {
-                    this.io.sockets.sockets[data.socketId].join(data.room);
+                nsp = event.data.socketId.indexOf('#') === -1 ? "/" : event.data.socketId.split('#')[0];
+                if (event.data.socketId && this.io.of(nsp).connected[event.data.socketId]) {
+                    this.io.of(nsp).connected[event.data.socketId].join(room);
                 }
                 break;
             case 'leave':
-                if (data.socketId && this.io.sockets.sockets[data.socketId]) {
-                    this.io.sockets.sockets[data.socketId].leave(data.room);
+                nsp = event.data.socketId.indexOf('#') === -1 ? "/" : event.data.socketId.split('#')[0];
+                if (event.data.socketId && this.io.of(nsp).connected[event.data.socketId]) {
+                    this.io.of(nsp).connected[event.data.socketId].leave(room);
                 }
                 break;
             default:
+                nsp = '/' + this.getIoNsp(channel);
                 if (room) {
                     delete event.data.room;
-                    this.io.of('/' + nsp).to(room).emit(event.name, event.data);
+                    delete event.data.socketId;
+                    this.io.of(nsp).to(room).emit(event.name, event.data);
                 } else {
-                    this.io.of('/' + nsp).emit(event.name, event.data);
+                    this.io.of(nsp).emit(event.name, event.data);
                 }
         }
 
         logger.info('emit', {
             nsp: nsp,
+            name: event.name,
             room: room || '',
             data: event.data
         });

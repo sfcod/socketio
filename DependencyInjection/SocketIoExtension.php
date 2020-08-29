@@ -13,6 +13,8 @@ use SfCod\SocketIoBundle\Events\EventSubscriberInterface;
 use SfCod\SocketIoBundle\Middleware\Process\DoctrineReconnect;
 use SfCod\SocketIoBundle\Service\Broadcast;
 use SfCod\SocketIoBundle\Service\EventManager;
+use SfCod\SocketIoBundle\Service\JoinHandler;
+use SfCod\SocketIoBundle\Service\LeaveHandler;
 use SfCod\SocketIoBundle\Service\Process;
 use SfCod\SocketIoBundle\Service\RedisDriver;
 use SfCod\SocketIoBundle\Service\Worker;
@@ -55,6 +57,7 @@ class SocketIoExtension extends Extension
         $this->createProcess($config, $container);
         $this->createWorker($config, $container);
         $this->createCommands($config, $container);
+        $this->createHandlers($config, $container);
 
         $eventManager = $container->get(EventManager::class);
 
@@ -164,6 +167,30 @@ class SocketIoExtension extends Extension
         ]);
 
         $container->setDefinition(Worker::class, $worker);
+    }
+
+    /**
+     * Create handlers.
+     *
+     * @throws \Exception
+     */
+    private function createHandlers(array $config, ContainerBuilder $container)
+    {
+        $joinHandler = new Definition(JoinHandler::class);
+        $joinHandler->setArguments([
+            new Reference(Broadcast::class),
+            new Reference(LoggerInterface::class),
+        ]);
+        $joinHandler->addTag('sfcod.socketio.event');
+        $container->setDefinition(JoinHandler::class, $joinHandler);
+
+        $leaveHandler = new Definition(LeaveHandler::class);
+        $leaveHandler->setArguments([
+            new Reference(Broadcast::class),
+            new Reference(LoggerInterface::class),
+        ]);
+        $leaveHandler->addTag('sfcod.socketio.event');
+        $container->setDefinition(LeaveHandler::class, $leaveHandler);
     }
 
     /**
