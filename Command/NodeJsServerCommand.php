@@ -65,5 +65,7 @@ class NodeJsServerCommand extends Command
         $process->setIdleTimeout(false);
         $process->setTimeout(null);
         $process->run();
+
+        return 0;
     }
 }
