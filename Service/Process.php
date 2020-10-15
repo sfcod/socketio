@@ -85,7 +85,14 @@ class Process
      */
     private function push(string $handle, array $data): \Symfony\Component\Process\Process
     {
-        $cmd = sprintf('php %s socket-io:process --handler=%s --data=%s --env=%s', $this->scriptName, escapeshellarg($handle), escapeshellarg(serialize($data)), getenv('APP_ENV'));
+        $cmd = [
+            'php',
+            $this->scriptName,
+            'socket-io:process',
+            '--handler=' . escapeshellarg($handle),
+            '--data=' . escapeshellarg(serialize($data)),
+            '--env=prod',
+        ];
 
         $process = new \Symfony\Component\Process\Process($cmd, $this->binPath);
         $process->setTimeout(10);

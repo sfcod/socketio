@@ -1,6 +1,6 @@
 <?php
 
-namespace SfCod\SocketIoBundle\Tests;
+namespace SfCod\SocketIoBundle\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
