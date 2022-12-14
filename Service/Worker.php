@@ -51,7 +51,7 @@ class Worker
      */
     public function nodeJs(string $server, string $ssl = ''): Process
     {
-        $cmd = sprintf('node %s/%s', realpath(dirname(__FILE__) . '/../Server'), 'index.js');
+        $cmd = sprintf('node %s/%s', dirname(__DIR__ . '../Server'), 'index.js');
 
         $connection = json_encode(array_filter([
             'host' => $this->redisDriver->getHost(),
@@ -72,9 +72,7 @@ class Worker
             $cmd .= ' -' . $key . '=\'' . $value . '\'';
         }
 
-        $process = new Process($cmd);
-
-        return $process;
+        return new Process([$cmd]);
     }
 
     /**
