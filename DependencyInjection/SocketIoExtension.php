@@ -128,7 +128,7 @@ class SocketIoExtension extends Extension
     {
         $eventManager = new Definition(EventManager::class);
         $eventManager->setArguments([
-            $container->getParameter('kernel.root_dir'),
+            $container->getParameter('kernel.project_dir'),
             $config['namespaces'],
         ]);
 
@@ -163,7 +163,7 @@ class SocketIoExtension extends Extension
             new Reference(Broadcast::class),
             $container->hasParameter('kernel.logs_dir') ?
                 $container->getParameter('kernel.logs_dir') . '/socketio' :
-                $container->getParameter('kernel.root_dir') . '/../../var/log/socketio',
+                $container->getParameter('kernel.project_dir') . '/../../var/log/socketio',
         ]);
 
         $container->setDefinition(Worker::class, $worker);
