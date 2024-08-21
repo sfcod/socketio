@@ -6,6 +6,7 @@ use SfCod\SocketIoBundle\DependencyInjection\Compiler\EventCompilerPass;
 use SfCod\SocketIoBundle\DependencyInjection\SocketIoExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * Class SfCodSocketIoBundle.
@@ -21,7 +22,7 @@ class SfCodSocketIoBundle extends Bundle
      *
      * @return SocketIoExtension|\Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new SocketIoExtension();
     }

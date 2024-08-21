@@ -21,7 +21,7 @@ class SocketIoConfiguration implements ConfigurationInterface
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         if (Kernel::VERSION_ID >= 40300) {
             $treeBuilder = new TreeBuilder('sfcod_socketio');
