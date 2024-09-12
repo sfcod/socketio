@@ -64,7 +64,7 @@ class Worker
             'pub' => $connection,
             'sub' => $connection,
             'channels' => implode(',', $this->broadcast->channels()),
-            'nsp' => getenv('SOCKET_IO_NSP'),
+            'nsp' => $_ENV['SOCKET_IO_NSP'],
             'ssl' => empty($ssl) ? null : $ssl,
             'runtime' => $this->logDir,
         ], 'strlen');

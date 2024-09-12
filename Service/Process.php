@@ -42,13 +42,11 @@ class Process
      */
     public function getParallelEnv(): int
     {
-        return getenv('SOCKET_IO.PARALLEL') ? getenv('SOCKET_IO.PARALLEL') : 10;
+        return $_ENV['SOCKET_IO.PARALLEL'] ?? 10;
     }
 
     /**
      * Run process. If more then limit then wait and try run process on more time.
-     *
-     * @return \Symfony\Component\Process\Process
      */
     public function run(string $handle, array $data)
     {
@@ -85,7 +83,7 @@ class Process
      */
     private function push(string $handle, array $data): \Symfony\Component\Process\Process
     {
-        $cmd = sprintf('php %s socket-io:process --handler=%s --data=%s --env=%s', $this->scriptName, escapeshellarg($handle), escapeshellarg(serialize($data)), getenv('APP_ENV'));
+        $cmd = sprintf('php %s socket-io:process --handler=%s --data=%s --env=%s', $this->scriptName, escapeshellarg($handle), escapeshellarg(serialize($data)), $_ENV['APP_ENV']);
 
         $process = \Symfony\Component\Process\Process::fromShellCommandline($cmd, $this->binPath);
         $process->setTimeout(10);

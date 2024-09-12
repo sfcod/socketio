@@ -59,8 +59,8 @@ class NodeJsServerCommand extends Command
         $io->success(sprintf('Worker daemon has been started.'));
 
         $process = $this->worker->nodeJs(
-            $input->getOption('server') ?? getenv('SOCKET_IO_WS_SERVER'),
-            $input->getOption('ssl') ?? getenv('SOCKET_IO_SSL') ? getenv('SOCKET_IO_SSL') : ''
+            $input->getOption('server') ?? $_ENV['SOCKET_IO_WS_SERVER'],
+            $input->getOption('ssl') ?? $_ENV['SOCKET_IO_SSL'] ?? ''
         );
         $process->setIdleTimeout(false);
         $process->setTimeout(null);

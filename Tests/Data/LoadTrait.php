@@ -24,7 +24,7 @@ trait LoadTrait
 
         $extension = new SocketIoExtension();
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.project_dir', getenv('KERNEL_PROJECT_DIR'));
+        $container->setParameter('kernel.project_dir', $_ENV['KERNEL_PROJECT_DIR']);
         $container->setParameter('kernel.root_dir', realpath(__DIR__ . '/../../../../SfCod/'));
         $container->set(LoggerInterface::class, new Logger('test'));
 

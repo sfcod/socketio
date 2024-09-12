@@ -174,7 +174,7 @@ class Broadcast
      */
     protected function channelName(string $name): string
     {
-        return $name . getenv('SOCKET_IO_NSP');
+        return $name . $_ENV['SOCKET_IO_NSP'];
     }
 
     /**
